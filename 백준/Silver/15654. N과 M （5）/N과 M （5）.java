@@ -7,6 +7,7 @@ public class Main {
     private static int m;
     private static int[] arr;
     private static int[] inputs;
+    private static StringBuilder answer = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         init();
@@ -28,9 +29,10 @@ public class Main {
         Arrays.sort(inputs);
     }
 
-    private static void dfs(int idx, boolean[] visited) {
+    private static void dfs(int idx, boolean[] visited) throws IOException {
         if (idx == m) {
             printArray(arr);
+            System.out.print(answer);
             return;
         }
 
@@ -45,10 +47,10 @@ public class Main {
     }
 
     private static void printArray(int[] arr) {
-        StringBuilder sb = new StringBuilder();
+        answer = new StringBuilder();
         for (int i = 0; i < arr.length; i++) {
-            sb.append(arr[i]).append("\n");
+            answer.append(arr[i]).append(" ");
         }
-        System.out.print(sb);
+        answer.append("\n");
     }
 }
