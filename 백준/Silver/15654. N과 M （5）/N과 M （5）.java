@@ -3,68 +3,51 @@ import java.util.*;
 
 public class Main {
 
-    private static int N, M;
+    private static int n;
+    private static int m;
     private static int[] arr;
-
-    private static boolean[] used;
-
-    private static int[] sequence;
+    private static int[] inputs;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-
-        StringTokenizer st = new StringTokenizer(input.readLine());
-
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-
-        arr = new int[N];
-
-        Set<Integer> intHashSet = new HashSet<>();
-
-        st = new StringTokenizer(input.readLine());
-
-        for (int i = 0; i < N; i++) {
-            intHashSet.add(Integer.parseInt(st.nextToken()));
-        }
-
-        int idx = 0;
-
-        for (int num : intHashSet) {
-            arr[idx] = num;
-            idx++;
-        }
-
-        Arrays.sort(arr);
-
-        used = new boolean[N];
-
-        sequence = new int[N];
-
-        dfs(0);
+        init();
+        dfs(0, new boolean[n]);
     }
 
-    static void dfs(int idx) {
-        if (idx == M) {
-            for (int i = 0; i < M; i++) {
-                if (i != 0) {
-                    System.out.print(' ');
-                }
-                System.out.print(sequence[i]);
-            }
-            System.out.println();
+    private static void init() throws IOException {
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer tokenizer = new StringTokenizer(input.readLine());
+        n = Integer.parseInt(tokenizer.nextToken());
+        m = Integer.parseInt(tokenizer.nextToken());
 
+        inputs = new int[n];
+        tokenizer = new StringTokenizer(input.readLine());
+        for (int i = 0; i < n; i++) {
+            inputs[i] = Integer.parseInt(tokenizer.nextToken());
+        }
+        arr = new int[m];
+        Arrays.sort(inputs);
+    }
+
+    private static void dfs(int idx, boolean[] visited) {
+        if (idx == m) {
+            printArray(arr);
             return;
         }
 
-        for (int i = 0; i < N; i++) {
-            if (!used[i]) {
-                used[i] = true;
-                sequence[idx] = arr[i];
-                dfs(idx + 1);
-                used[i] = false;
-                sequence[idx] = 0;
+        for (int i = 0; i < n; i++) {
+            if (!visited[i]) {
+                arr[idx] = inputs[i];
+                visited[i] = true;
+                dfs(idx + 1, visited);
+                visited[i] = false;
             }
         }
+    }
+
+    private static void printArray(int[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i] + " ");
+        }
+        System.out.println();
     }
 }
