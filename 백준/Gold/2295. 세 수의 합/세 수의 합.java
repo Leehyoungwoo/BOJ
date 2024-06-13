@@ -1,26 +1,32 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int N = sc.nextInt();
-        int[] arr = new int[N];
-        for (int i = 0; i < N; i++)arr[i] = sc.nextInt();
+
+    private static int n;
+    private static List<Integer> list = new ArrayList<>();
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        n = Integer.parseInt(input.readLine());
+        for (int i = 0; i < n; i++) {
+            list.add(Integer.parseInt(input.readLine()));
+        }
         List<Integer> sum = new ArrayList<>();
-        for (int i = 0 ; i < N ; i++){
-            for (int j = 0 ; j < N; j++){
-                sum.add(arr[i] + arr[j]);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                sum.add(list.get(i) + list.get(j));
             }
         }
-        Arrays.sort(arr);
         Collections.sort(sum);
-
-        for (int i = N-1; i>=0; i--){
-            for (int j = N-1; j>=0; j--){
-                int minus = arr[i] - arr[j];
-
-                if (Collections.binarySearch(sum,minus)>=0){
-                    System.out.println(arr[i]);
+        Collections.sort(list);
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = n - 1; j >= 0; j--) {
+                int z = list.get(i) - list.get(j);
+                if (Collections.binarySearch(sum, z) >= 0) {
+                    System.out.println(list.get(i));
                     return;
                 }
             }
