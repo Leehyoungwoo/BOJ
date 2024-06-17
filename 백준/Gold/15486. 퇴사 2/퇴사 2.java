@@ -34,7 +34,6 @@ public class Main {
             if (i + time - 1 > n) continue;
             dp[i + time - 1] = Math.max(warning + dp[i - 1], dp[i + time - 1]);
         }
-        Arrays.sort(dp);
         System.out.println(dp[n]);
     }
 }
