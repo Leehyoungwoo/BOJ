@@ -11,7 +11,7 @@ public class Main {
         long right = n * (long)n;
         long answer = 0;
         while (left <= right) {
-            long mid = left + (right - left) / 2;
+            long mid = (left + right) / 2;
             if (countLessOrEqual(mid, n) >= k) {
                 answer = mid;
                 right = mid - 1;
