@@ -25,18 +25,18 @@ public class Main {
         m = Integer.parseInt(tokenizer.nextToken());
         graph = new ArrayList<>();
         for (int i = 0; i < n + 1; i++) {
-            graph.add(new ArrayList<>());
+            List<Integer> list = new ArrayList<>();
+            graph.add(list);
         }
         for (int i = 0; i < m; i++) {
             tokenizer = new StringTokenizer(input.readLine());
             int start = Integer.parseInt(tokenizer.nextToken());
             int end = Integer.parseInt(tokenizer.nextToken());
             graph.get(start).add(end);
-            graph.get(end).add(start);  
+            graph.get(end).add(start);
         }
         distance = new int[n + 1];
         Arrays.fill(distance, Integer.MAX_VALUE);
-        distance[a] = 0;  
     }
 
     private static void findAnswer() {
@@ -45,6 +45,7 @@ public class Main {
             return;
         }
         Queue<Integer> queue = new LinkedList<>();
+        distance[a] = 0;
         queue.offer(a);
         while (!queue.isEmpty()) {
             int cur = queue.poll();
@@ -57,8 +58,8 @@ public class Main {
         }
         if (distance[b] == Integer.MAX_VALUE) {
             System.out.println(-1);
-        } else {
-            System.out.println(distance[b]);
+            return;
         }
+        System.out.println(distance[b]);
     }
 }
