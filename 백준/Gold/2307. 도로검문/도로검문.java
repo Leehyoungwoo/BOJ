@@ -49,7 +49,7 @@ public class Main {
 
         int to = n;
         int maxDelay = 0;
-        do {
+        while (to != 1) {
             int from = path[to];
             int delay = findBlockedTime(from, to);
             if (delay == Integer.MAX_VALUE) {
@@ -58,7 +58,7 @@ public class Main {
             }
             maxDelay = Math.max(maxDelay, delay);
             to = from;
-        } while (to != 1);
+        }
 
         if (maxDelay == Integer.MAX_VALUE) {
             answer = -1;
