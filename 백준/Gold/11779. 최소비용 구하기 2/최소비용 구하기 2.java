@@ -22,28 +22,23 @@ public class Main {
         PriorityQueue<Edge> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a.cost));
         pq.offer(new Edge(start, 0));
         distance[start] = 0;
-
         while (!pq.isEmpty()) {
             Edge edge = pq.poll();
             int cur = edge.next;
             int curCost = edge.cost;
-
             if (curCost > distance[cur]) {
                 continue;
             }
-
             for (Edge next : graph[cur]) {
                 int nextIdx = next.next;
                 int nextCost = next.cost;
-
                 if (distance[nextIdx] > distance[cur] + nextCost) {
                     path[nextIdx] = cur;
                     distance[nextIdx] = distance[cur] + nextCost;
-                    pq.offer(new Edge(nextIdx, distance[nextIdx]));
+                    pq.offer(new Edge(nextIdx, nextCost));
                 }
             }
         }
-
         StringBuilder answer = new StringBuilder();
         List<Integer> paths = new ArrayList<>();
         answer.append(distance[end]).append("\n");
@@ -64,7 +59,6 @@ public class Main {
         findPath(path[n], paths);
     }
 
-    @SuppressWarnings("unchecked")
     private static void init() throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
         n = Integer.parseInt(input.readLine());
@@ -89,7 +83,6 @@ public class Main {
         end = Integer.parseInt(s[1]);
     }
 }
-
 class Edge {
     int next;
     int cost;
