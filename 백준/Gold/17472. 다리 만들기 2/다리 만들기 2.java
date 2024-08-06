@@ -42,9 +42,11 @@ public class Main {
     private static void union(int a, int b) {
         int aParent = find(a);
         int bParent = find(b);
-        if (aParent != bParent) {
+        if (aParent < bParent) {
             parent[bParent] = aParent;
+            return;
         }
+        parent[aParent] = bParent;
     }
 
     private static int find(int a) {
