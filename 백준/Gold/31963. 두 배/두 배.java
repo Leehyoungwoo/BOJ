@@ -15,13 +15,13 @@ public class Main {
         for (int i = 0; i < n; i++) {
             arr[i] = Integer.parseInt(tokenizer.nextToken());
         }
-        int count = 0;
+        long count = 0;  
+        long[] result = new long[n];  
         for (int i = 1; i < n; i++) {
-            if (arr[i] < arr[i - 1]) {
-                while (arr[i] < arr[i - 1]) {
-                    arr[i] *= 2;
-                    count++;
-                }
+            double ratio = Math.ceil(Math.log(arr[i - 1] / (double)arr[i]) / Math.log(2)) + result[i - 1];
+            if (ratio > 0) {
+                result[i] = Math.max(0, (long)ratio); 
+                count += result[i]; 
             }
         }
         System.out.println(count);
