@@ -1,0 +1,32 @@
+-- 코드를 작성해주세요
+WITH YearlyData AS (
+    SELECT
+        EXTRACT(YEAR FROM DIFFERENTIATION_DATE) AS YEAR,
+        MAX(SIZE_OF_COLONY) AS MAX_SIZE
+    FROM
+        ECOLI_DATA
+    GROUP BY
+        EXTRACT(YEAR FROM DIFFERENTIATION_DATE)
+),
+DeviationData AS (
+    SELECT
+        EXTRACT(YEAR FROM e.DIFFERENTIATION_DATE) AS YEAR,
+        y.MAX_SIZE - e.SIZE_OF_COLONY AS YEAR_DEV,
+        e.ID
+    FROM
+        ECOLI_DATA e
+    JOIN
+        YearlyData y
+    ON
+        EXTRACT(YEAR FROM e.DIFFERENTIATION_DATE) = y.YEAR
+)
+SELECT
+    YEAR,
+    YEAR_DEV,
+    ID
+FROM
+    DeviationData
+ORDER BY
+    YEAR ASC,
+    YEAR_DEV ASC;
+    
