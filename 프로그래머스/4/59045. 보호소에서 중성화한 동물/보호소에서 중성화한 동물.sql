@@ -1,0 +1,13 @@
+SELECT 
+    i.ANIMAL_ID, 
+    i.ANIMAL_TYPE, 
+    i.NAME
+FROM 
+    ANIMAL_INS i
+JOIN 
+    ANIMAL_OUTS o ON i.ANIMAL_ID = o.ANIMAL_ID
+WHERE 
+    i.SEX_UPON_INTAKE LIKE 'Intact%' 
+    AND (o.SEX_UPON_OUTCOME LIKE '%Neutered%' OR o.SEX_UPON_OUTCOME LIKE '%Spayed%') 
+ORDER BY 
+    i.ANIMAL_ID;
