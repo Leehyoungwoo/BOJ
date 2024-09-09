@@ -1,75 +1,52 @@
-import java.util.Arrays;
+import java.util.*;
 
 class Solution {
-    
-    private static int[][] giftRate;
-    private static int[] result;
+
+    private int l;
+    private Map<String, Integer> map = new HashMap<>();
 
     public int solution(String[] friends, String[] gifts) {
-        int answer = 0;
-        giftRate = new int[friends.length][friends.length];
-        result = new int[friends.length];
-        fillGiftRate(gifts, friends);
-        givePresent();
-        Arrays.sort(result);
-        answer = result[friends.length - 1];
-        return answer;
-    }
-    
-    private void fillGiftRate(String[] gifts, String[] friends) {
-        for (String s : gifts) {
-            int from = 0;
-            int to = 0;
-            String[] fromTo = s.split(" ");
-            for (int i = 0; i < result.length; i++) {
-                if (fromTo[0].equals(friends[i])) {
-                    from = i;
-                    continue;
-                }
-                if (fromTo[1].equals(friends[i])) {
-                    to = i;
-                }
-            }
-            giftRate[from][to]++;
+        l = friends.length;
+        findIdx(friends);
+        int[][] lastMonthCount = new int[l][l];
+        int[] giftPoint = new int[l];
+        for (String record : gifts) {
+            String[] fromTo = record.split(" ");
+            int from = map.get(fromTo[0]);
+            int to = map.get(fromTo[1]);
+            lastMonthCount[from][to]++;
+            giftPoint[from]++;
+            giftPoint[to]--;
         }
-    }
 
-    private void givePresent() {
-        for (int i = 0; i < result.length; i++) {
-            for (int j = i + 1; j < result.length; j++) {
-                if(i == j) continue;
-                if (giftRate[i][j] > giftRate[j][i]) {
-                    result[i]++;
+        int[] thisMonthCount = new int[l];
+        for (int i = 0; i < l; i++) {
+            for (int j = i + 1; j < l; j++) {
+                if (i == j) {
                     continue;
                 }
-
-                if (giftRate[i][j] < giftRate[j][i]) {
-                    result[j]++;
-                }
-
-                if (giftRate[i][j] == giftRate[j][i]) {
-                    int iSum = sum(i);
-                    int jSum = sum(j);
-                    if (iSum > jSum) {
-                        result[i]++;
-                    }
-                    if (iSum < jSum) {
-                        result[j]++;
+                if (lastMonthCount[i][j] > lastMonthCount[j][i]) {
+                    thisMonthCount[i]++;
+                } else if (lastMonthCount[i][j] < lastMonthCount[j][i]) {
+                    thisMonthCount[j]++;
+                } else {
+                    if (giftPoint[i] > giftPoint[j]) {
+                        thisMonthCount[i]++;
+                    } else if (giftPoint[i] < giftPoint[j]) {
+                        thisMonthCount[j]++;
                     }
                 }
             }
         }
+        int max = Arrays.stream(thisMonthCount).max().orElse(0);
+
+        return max;
     }
 
-    private int sum(int n) {
-        int sum = 0;
-        for (int i = 0; i < result.length; i++) {
-            sum += giftRate[n][i];
+    private void findIdx(String[] friends) {
+        for (int i = 0; i < friends.length; i++) {
+            String key = friends[i];
+            map.put(key, i);
         }
-        for(int i = 0; i < result.length; i++) {
-            sum-= giftRate[i][n];
-        }
-        return sum;
     }
-
 }
