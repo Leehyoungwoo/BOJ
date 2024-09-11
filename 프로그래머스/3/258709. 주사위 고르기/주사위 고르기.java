@@ -2,135 +2,94 @@ import java.util.*;
 
 class Solution {
 
-    int[][] globalDice;
-    int maxWin = Integer.MIN_VALUE;
-    int[] maxWinCase;
-    int n;
-    // 뽑힌 주사위 조합, 이게 아닌게 B...?
-    List<int[]> diceComb;
-    List<Integer> aScore;
-    List<Integer> bScore;
+    private List<Integer> aDice = new ArrayList<>();
+    private List<Integer> bDice = new ArrayList<>();
+    private List<Integer> aScore = new ArrayList<>();
+    private List<Integer> bScore = new ArrayList<>();
+    private int maxWinToA = Integer.MIN_VALUE;
+    private int[] maxWInComb = new int[2];
 
     public int[] solution(int[][] dice) {
-        int[] answer = new int[n / 2];
-        init(dice);
-        // 나올 수 있는 주사위 조합을 배열에 담음
-        findDiceComb(0, 0, new int[n / 2]);
-        // 나올 수 있는 점수를 찾아서 score A, B에 담고,
-        // 이분 탐색으로 이기는 경우, 지는 경우를 찾아야 함
-        findWinRate();
-        return maxWinCase;
+        int[] answer = {};
+        findComb(0, 1, dice);
+        answer = maxWInComb;
+        return answer;
     }
 
-    // 승수 세기
-    private void findWinRate() {
-        for (int[] combA : diceComb) {
-            int[] combB = findNotDices(combA);
-//            soutPrint(combB);
-            aScore = new ArrayList<>(); // A가 선택한 주사위의 모든 조합
-            bScore = new ArrayList<>(); // B가 선택한 주사위의 모든 조합
-            combDice(0, combA, globalDice, 0, aScore);
-            combDice(0, combB, globalDice, 0, bScore);
-            // 순서대로 정렬
+    private void findComb(int idx, int start, int[][] dice) {
+        if (idx == dice.length / 2) {
+//            System.out.println("a주사위" + aDice);
+            findBDice(dice);
+            makeScore(0, dice, 0, aScore, aDice);
+            makeScore(0, dice, 0, bScore, bDice);
             Collections.sort(aScore);
             Collections.sort(bScore);
-
-            // 이분탐색으로 승수 계산
-            int totalCount = getTotalCount();
-
-            // 만약 최고 승수가 갱신되면, 조합과 승수를 기록
-            if (totalCount > maxWin) {
-                maxWin = totalCount;
-                updateAnswer(maxWinCase, combA);
+//            System.out.println("b주사위 :" + bDice);
+//            System.out.println(" a점수 : " + aScore);
+//            System.out.println("개수 :" + aScore.size());
+//            System.out.println(" b점수 : " + bScore);
+            // aScore 별로 b한테 몇번 이기는지? 기록. 가장 많이 이기는 조합을 max로 숫자와 조합 둘다 기록
+            int aWin = 0;
+            for (Integer aGot : aScore) {
+                int count = findWinCount(aGot);
+                aWin += count;
             }
-        }
-    }
-    private int getTotalCount() {
-        int totalWinCount = 0;
-
-        for (Integer a : aScore) {
-            int left = 0;
-            int right = bScore.size();
-
-            while (left + 1 < right) {
-                int mid = (left + right) / 2;
-
-                if (a > bScore.get(mid)) {
-                    left = mid;
-                } else {
-                    right = mid;
-                }
+            if (aWin > maxWinToA) {
+                maxWinToA = aWin;
+                maxWInComb = aDice.stream().mapToInt(Integer::intValue).toArray();
             }
-
-            totalWinCount += left + 1;
-        }
-
-        return totalWinCount;
-    }
-
-    private void updateAnswer(int[] maxWinCase, int[] aDice) {
-        for (int i = 0; i < maxWinCase.length; i++) {
-            maxWinCase[i] = aDice[i] + 1;
-        }
-    }
-
-    private int[] findNotDices(int[] dices) {
-        boolean[] visited = new boolean[n];
-        for (int i = 0; i < dices.length; i++) {
-            visited[dices[i]] = true;
-        }
-        int[] temp = new int[n / 2];
-        int idx = 0;
-        for (int i = 0; i < visited.length; i++) {
-            if (!visited[i]) {
-                temp[idx] = i;
-                idx++;
-            }
-        }
-        return temp;
-    }
-
-    // a가 01 이면 b는 23이여야함
-    // a가 02이면 b는 13
-    void combDice(int idx, int[] dices, int[][] originDices, int sum, List<Integer> team) {
-        if (idx == n / 2) {
-            team.add(sum);
+//            System.out.println(aWin);
+            // 재귀 종료되면서 점수 조합과 b 주사위 조합 초기화
+            aScore.clear();
+            bScore.clear();
+            bDice.clear();
             return;
         }
 
+        if (start == dice.length + 1) {
+            return;
+        }
+
+        aDice.add(start);
+        findComb(idx + 1, start + 1, dice);
+        aDice.remove(aDice.size() - 1);
+        findComb(idx, start + 1, dice);
+    }
+
+    private int findWinCount(Integer aGot) {
+        int left = 0;
+        int right = bScore.size() - 1;
+        int cnt = 0;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (aGot > bScore.get(mid)) {
+                cnt = mid + 1;
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+
+        return cnt;
+    }
+
+    private void makeScore(int idx, int[][] dice, int sum, List<Integer> score, List<Integer> personDice) {
+        if (idx == dice.length / 2) {
+            score.add(sum);
+            return;
+        }
         for (int i = 0; i < 6; i++) {
-            combDice(idx + 1, dices, originDices, sum + originDices[dices[idx]][i], team);
+            makeScore(idx + 1, dice, sum + dice[personDice.get(idx) - 1][i], score, personDice);
         }
     }
 
-    private void init(int[][] dice) {
-        diceComb = new ArrayList<>();
-        aScore = new ArrayList<>();
-        bScore = new ArrayList<>();
-        n = dice.length;
-        maxWinCase = new int[n / 2];
-        globalDice = dice;
-    }
-
-    /// 나올 수 있는 주사위 조합
-    // 주사위가 두 개이면 0, 1
-    private void findDiceComb(int idx, int start, int[] arr) {
-        if (idx == n / 2) {
-            diceComb.add(arr.clone());
-            return;
+    private void findBDice(int[][] dice) {
+        for (int i = 1; i < dice.length + 1; i++) {
+            if (aDice.contains(i)) {
+                continue;
+            }
+            bDice.add(i);
         }
-        if (start == n) {
-            return;
-        }
-        arr[idx] = start;
-        findDiceComb(idx + 1, start + 1, arr);
-        findDiceComb(idx, start + 1, arr);
-    }
-
-    private static void soutPrint(int[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            System.out.print(arr[i] + " ");
-        }
-        System.out.println();
     }
 }
