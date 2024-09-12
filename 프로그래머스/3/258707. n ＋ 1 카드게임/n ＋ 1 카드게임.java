@@ -5,7 +5,7 @@ class Solution {
     int n;
 
     public int solution(int coin, int[] cards) {
-int round = 1;
+        int round = 1;
         n = cards.length;
         int curIdx = n / 3;
         List<Integer> possession = new ArrayList<>();
@@ -17,9 +17,6 @@ int round = 1;
         L:
         while (true) {
             /* 반복문 종료 조건 */
-            if (round > n / 3 + 1) { // 가능한 최대 라운드 넘어가면 종료
-                break;
-            }
             if (curIdx >= n) { // 카드 뭉치가 모두 소진되면 종료
                 break;
             }
@@ -36,6 +33,7 @@ int round = 1;
 
             /* 소유 카드 중 1개 + 후보군 1개 로 n+1 가능하면 코인 1개 소진 */
             if (coin > 0) {
+                boolean flag = false; 
                 for (int i = 0; i < possession.size(); i++) {
                     int target = n + 1 - possession.get(i);
                     if (candidates.contains(target)) {
