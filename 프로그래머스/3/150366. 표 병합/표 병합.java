@@ -1,6 +1,7 @@
-import java.awt.*;
 import java.util.*;
+import java.awt.*;
 import java.util.List;
+
 
 class Solution {
 
@@ -9,7 +10,9 @@ class Solution {
 
     public String[] solution(String[] commands) {
         initExcel();
-        for (String command : commands) runCommand(command.split(" "));
+        for (String command : commands) {
+            runCommand(command.split(" "));
+        }
         return prints.toArray(String[]::new);
     }
 
@@ -20,7 +23,9 @@ class Solution {
                 int row = Integer.parseInt(command[1]) - 1;
                 int col = Integer.parseInt(command[2]) - 1;
                 update(row, col, command[3]);
-            } else update(command[1], command[2]);
+            } else {
+                update(command[1], command[2]);
+            }
         } else if (type.equals("MERGE")) {
             int r1 = Integer.parseInt(command[1]) - 1;
             int c1 = Integer.parseInt(command[2]) - 1;
@@ -41,7 +46,9 @@ class Solution {
     private void update(String fromValue, String toValue) {
         for (Cell[] cells : excel)
             for (Cell cell : cells)
-                if (cell.value.equals(fromValue)) cell.update(toValue);
+                if (cell.value.equals(fromValue)) {
+                    cell.update(toValue);
+                }
     }
 
     private void update(int row, int col, String value) {
@@ -52,7 +59,9 @@ class Solution {
         Cell cell1 = excel[row1][col1];
         Cell cell2 = excel[row2][col2];
         if (!cell1.equals(cell2)) {
-            if (cell1.value.equals("")) cell1.value = cell2.value;
+            if (cell1.value.equals("")) {
+                cell1.value = cell2.value;
+            }
             for (Point cellPoint : cell2.cellPoints) {
                 excel[cellPoint.x][cellPoint.y] = cell1;
                 cell1.cellPoints.add(cellPoint);
@@ -62,16 +71,20 @@ class Solution {
 
     private void unmerge(int row, int col) {
         Cell cell = excel[row][col];
-        for (Point cellPoint : cell.cellPoints)
+        for (Point cellPoint : cell.cellPoints) {
             excel[cellPoint.x][cellPoint.y] = new Cell(cellPoint.x, cellPoint.y);
+        }
         excel[row][col] = new Cell(row, col);
         excel[row][col].value = cell.value;
     }
 
     private void print(int row, int col) {
         Cell cell = excel[row][col];
-        if (cell.value.equals("")) prints.add("EMPTY");
-        else prints.add(cell.value);
+        if (cell.value.equals("")) {
+            prints.add("EMPTY");
+        } else {
+            prints.add(cell.value);
+        }
     }
 
     private void initExcel() {
@@ -80,6 +93,7 @@ class Solution {
                 excel[r][c] = new Cell(r, c);
     }
 }
+
 class Cell {
 
     String value = "";
