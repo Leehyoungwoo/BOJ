@@ -2,25 +2,24 @@ import java.util.*;
 
 class Solution {
 
-    // D L R U 순서
-    final int[][] direction = {{1, 0}, {0, -1}, {0, 1}, {-1,0}};
-    char[][] map;
+    // D, L, R, U 순서
+    private final int[][] direction = {{1, 0}, {0, -1}, {0, 1}, {-1, 0}};
+    private char[][] map;
 
     public String solution(int n, int m, int x, int y, int r, int c, int k) {
-        String answer = "impossible";
-        // 초기화
+        String answer = "";
         map = new char[n + 1][m + 1];
         map[x][y] = 'S';
         map[r][c] = 'E';
-        answer = findAnswer(x, y, r, c, k, "");
+        answer = findAnwer(x, y, r, c, k, "");
         return answer.equals("") ? "impossible" : answer;
     }
-    // DFS로 푼다고 치면
-    // (k - 내 지금 지점랑 엔딩 지점이랑 거리)가 0보단 커야되고, 짝수여야 한다
-    public String findAnswer(int curR, int curC, int r, int c, int k, String way) {
+
+    private String findAnwer(int curR, int curC, int r, int c, int k, String way) {
         if (curR == r && curC == c) {
-            if (k == 0) return way;
-            else {
+            if (k == 0) {
+                return way;
+            } else {
                 if (!remainWay(curR, curC, r, c, k)) {
                     return "";
                 }
@@ -30,13 +29,12 @@ class Solution {
         if (!remainWay(curR, curC, r, c, k)) {
             return "";
         }
-
         for (int i = 0; i < direction.length; i++) {
             int[] dir = direction[i];
             int nextR = curR + dir[0];
             int nextC = curC + dir[1];
             if (isInRange(nextR, nextC)) {
-                String result = findAnswer(nextR, nextC, r, c, k - 1, way + direc(dir));
+                String result = findAnwer(nextR, nextC, r, c, k - 1, way + decideDirection(i));
                 if (!result.equals("")) {
                     return result;
                 }
@@ -45,28 +43,27 @@ class Solution {
         return "";
     }
 
-    public char direc(int[] d) {
-        if(d[0] == 1 && d[1] == 0) {
-            return 'd';
-        }
-
-        if(d[0] == 0 && d[1] == -1) {
-            return 'l';
-        }
-
-        if(d[0] == 0 && d[1] == 1) {
-            return 'r';
-        }
-
-        return 'u';
-    }
-
-    public boolean remainWay(int curR, int curC, int r, int c, int k) {
+    private boolean remainWay(int curR, int curC, int r, int c, int k) {
         int left = Math.abs(curR - r) + Math.abs(curC - c);
         return left <= k && (k - left) % 2 == 0;
     }
 
-    public boolean isInRange(int row, int col) {
-        return 1 <= row && row < map.length && 1 <= col && col < map[0].length;
+    private String decideDirection(int i) {
+        switch (i) {
+            case 0:
+                return "d"; // 아래
+            case 1:
+                return "l"; // 왼쪽
+            case 2:
+                return "r"; // 오른쪽
+            case 3:
+                return "u"; // 위
+            default:
+                return "";
+        }
+    }
+
+    private boolean isInRange(int row, int col) {
+        return 1 <= row && row <= map.length - 1 && 1 <= col && col <= map[0].length - 1;
     }
 }
