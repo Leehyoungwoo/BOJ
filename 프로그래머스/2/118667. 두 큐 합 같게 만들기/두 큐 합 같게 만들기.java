@@ -2,70 +2,54 @@ import java.util.*;
 
 class Solution {
 
-    long target;
-    Queue<Long> que1 = new LinkedList<>();
-    Queue<Long> que2 = new LinkedList<>();
-    long globalCount;
+    private Queue<Integer> que1 = new LinkedList<>();
+    private Queue<Integer> que2 = new LinkedList<>();
+    private long que1Sum;
+    private long que2Sum;
 
     public long solution(int[] queue1, int[] queue2) {
         long answer = -1;
-        init(queue1, queue2);
-        long s1 = findAllSum(que1);
-        long s2 = findAllSum(que2);
+        // 전체 sum 구하기
+        long total = findAllSum(queue1) + findAllSum(queue2);
+        long half = total / 2;
 
-        if ((s1 + s2) % 2 != 0) {
-            return answer;
-        }
+        // 큐에서 빠질때, 넣을 떄마다 sum을 계산하지 않고 변수로 다뤄보기
+        que1Sum = findAllSum(queue1);
+        que2Sum = findAllSum(queue2);
 
-        int count = 0;
-        int totalMoves = que1.size() + que2.size() * 2;
-        while (count < totalMoves) {
-            if (s1 == target) {
-                return count;
+        // 진짜 큐 채우기
+        fillRealQue(que1, queue1);
+        fillRealQue(que2, queue2);
+
+        long count = 0;
+        while (que1Sum != que2Sum) {
+            if (que1Sum > que2Sum) {
+                int poll = que1.poll();
+                que1Sum -= poll;
+                que2.offer(poll);
+                que2Sum += poll;
+            } else {
+                int poll = que2.poll();
+                que2Sum -= poll;
+                que1.offer(poll);
+                que1Sum += poll;
             }
-
-            if (s1 < target && !que2.isEmpty()) {
-                long n = que2.poll();
-                que1.offer(n);
-                s1 += n;
-                s2 -= n;
-            } else if (s1 > target && !que1.isEmpty()) {
-                long n = que1.poll();
-                que2.offer(n);
-                s1 -= n;
-                s2 += n;
+            if (count >= queue1.length + queue2.length + 2) {
+                return -1;
             }
             count++;
-
-            // 한계 상황을 넘어서면 종료
-            if(count > 600000) {
-                break;
-            }
         }
 
-        return -1; // 조건을 만족하는 경우를 찾지 못했을 때
+        return answer == -1 ? count : answer;
     }
 
-    public void init(int[] queue1, int[] queue2) {
-        long sum = 0;
-        for (int i = 0; i < queue1.length; i++) {
-            que1.offer((long) queue1[i]);
-            sum += queue1[i];
-        }
-
-        for (int i = 0; i < queue2.length; i++) {
-            que2.offer((long) queue2[i]);
-            sum += queue2[i];
-        }
-
-        target = sum / 2;
+    private long findAllSum(int[] queue) {
+        return Arrays.stream(queue).sum();
     }
 
-    public long findAllSum(Queue<Long> que) {
-        long sum = 0;
-        for (long n : que) {
-            sum += n;
+    private void fillRealQue(Queue<Integer> que, int[] queue) {
+        for (int i = 0; i < queue.length; i++) {
+            que.offer(queue[i]);
         }
-        return sum;
     }
 }
