@@ -2,65 +2,73 @@ import java.util.*;
 
 class Solution {
 
-    private int maxScoreDiff = 0;
-    private int[] bestDistribution;
+    private int maxDiff = 0;
+    private int[] bestShot;
 
     public int[] solution(int n, int[] info) {
-        bestDistribution = new int[11];
+        bestShot = new int[11];
 
-        backtrack(n, 0, new int[11], info);
-
-        if (maxScoreDiff == 0) {
+        backTracking(n, 0, new int[11], info);
+        // 라이언이 절대 어피치를 이길 수 없는 경우
+        // 어피치가 전부 베스트 샷으로 맞춘게 아니더라도 절대 이길 수 없을 수 있음
+        if (maxDiff == 0) {
             return new int[]{-1};
         }
-
-        return bestDistribution;
+        return bestShot;
     }
 
-    // 백트래킹 함수
-    private void backtrack(int arrowsLeft, int index, int[] lionInfo, int[] apeachInfo) {
-        if (index == 11 || arrowsLeft == 0) {
-            lionInfo[10] += arrowsLeft;
-            compareScores(lionInfo, apeachInfo);
-            lionInfo[10] -= arrowsLeft;
+    private void backTracking(int leftArrow, int idx, int[] lionInfo, int[] apeachInfo) {
+        // 남은 화살이 없거나 끝까지 다 쐈으면 종료
+        if (leftArrow == 0 || idx == 11) {
+            // 만약 끝까지 쐈는데 화살이 남았으면 0점에 다 쏴버리기
+            lionInfo[10] += leftArrow;
+            compareScore(lionInfo, apeachInfo);
+            // 되돌리기
+            lionInfo[10] -= leftArrow;
             return;
         }
 
-        if (arrowsLeft > apeachInfo[index]) {
-            lionInfo[index] = apeachInfo[index] + 1;
-            backtrack(arrowsLeft - lionInfo[index], index + 1, lionInfo, apeachInfo);
-            lionInfo[index] = 0;
+        if (leftArrow > apeachInfo[idx]) {
+            // 한발 더 쏴서 해당 점수 가져가기
+            lionInfo[idx] = apeachInfo[idx] + 1;
+            backTracking(leftArrow - lionInfo[idx], idx + 1, lionInfo, apeachInfo);
+            // 백트래킹
+            lionInfo[idx] = 0;
         }
 
-        backtrack(arrowsLeft, index + 1, lionInfo, apeachInfo);
+        // 남은 화살이 apeach의 해당 점수를 못이기면 다음 점수를 노려야하니까
+        backTracking(leftArrow, idx + 1, lionInfo, apeachInfo);
     }
 
-    private void compareScores(int[] lionInfo, int[] apeachInfo) {
-        int lionScore = 0, apeachScore = 0;
+    private void compareScore(int[] lionInfo, int[] apeachInfo) {
+        int lionScore = 0;
+        int apeachScore = 0;
 
         for (int i = 0; i < 11; i++) {
             if (lionInfo[i] > apeachInfo[i]) {
-                lionScore += (10 - i);
+                lionScore += 10 - i;
+                // 어피치가 0이상인데 라이인이 어피치보다 크지 않으면 어피치 점수 get
             } else if (apeachInfo[i] > 0) {
-                apeachScore += (10 - i);
+                apeachScore += 10 - i;
             }
         }
 
-        int scoreDiff = lionScore - apeachScore;
-        if (scoreDiff > maxScoreDiff || (scoreDiff == maxScoreDiff && isBetter(lionInfo))) {
-            maxScoreDiff = scoreDiff;
-            bestDistribution = lionInfo.clone();
+        int diff = lionScore - apeachScore;
+        if (diff > maxDiff || diff == maxDiff && isBetter(lionInfo)) {
+            maxDiff = diff;
+            bestShot = lionInfo.clone();
         }
     }
 
     private boolean isBetter(int[] lionInfo) {
         for (int i = 10; i >= 0; i--) {
-            if (lionInfo[i] > bestDistribution[i]) {
+            if (bestShot[i] < lionInfo[i]) {
                 return true;
-            } else if (lionInfo[i] < bestDistribution[i]) {
+            } else if (bestShot[i] > lionInfo[i]) {
                 return false;
             }
         }
+
         return false;
     }
 }
