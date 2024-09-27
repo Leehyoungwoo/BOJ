@@ -1,89 +1,89 @@
 import java.util.*;
+import java.time.*;
 
 class Solution {
 
-    int[] globalFees;
-    String[] globalRecords;
-    Map<String, String> inAndOut;
+    Set<String> cars = new HashSet<>();
+    Map<String, String> carStatus = new HashMap<>();
+    Map<String, Long> carPerTime = new HashMap<>();
+    private final String[] outTime = {"23", "59"};
 
     public int[] solution(int[] fees, String[] records) {
         int[] answer = {};
-        init(fees, records);
-        int[] time = findAnswer();
-        answer = new int[time.length];
-        for (int i = 0; i < time.length; i++) {
-            if(time[i] <= fees[0]) {
-                answer[i] = fees[1];
-            } else {
-                double result = (double)(time[i] - fees[0]) / fees[2];
-                answer[i] = (int)Math.ceil(result) * fees[3] +fees[1];
+
+        for (int i = 0; i < records.length; i++) {
+            String[] s = records[i].split(" ");
+            String time = s[0];
+            String car = s[1];
+            String type = s[2];
+            // 마지막에 차넘버로 정렬하려고 만든 set임
+            cars.add(car);
+            // type이 in이면 status에 시간 보관해주고 out이면 기존 시간 빼와서 아웃 시간이랑 비교해서 요금 산출
+            if (type.equals("IN")) {
+                carStatus.put(car, time);
+                continue;
+            }
+
+            // 요금 처리
+            if (type.equals("OUT")) {
+                String in = carStatus.get(car);
+                String[] inTime = in.split(":");
+                LocalTime startTime = LocalTime.of(Integer.parseInt(inTime[0]), Integer.parseInt(inTime[1]));
+                String[] outTime = time.split(":");
+                LocalTime endTime = LocalTime.of(Integer.parseInt(outTime[0]), Integer.parseInt(outTime[1]));
+                long parkingTime = Duration.between(startTime, endTime).toMinutes();
+                carPerTime.put(car, carPerTime.getOrDefault(car, 0L) + parkingTime);
+                carStatus.put(car, null);
             }
         }
+        // in만 있는 차량 요금 처리
+        for (Map.Entry<String, String> entry : carStatus.entrySet()) {
+            if (!Objects.isNull(entry.getValue())) {
+                String car = entry.getKey();
+                String in = carStatus.get(car);
+                String[] inTime = in.split(":");
+                LocalTime startTime = LocalTime.of(Integer.parseInt(inTime[0]), Integer.parseInt(inTime[1]));
+                LocalTime endTime = LocalTime.of(Integer.parseInt(outTime[0]), Integer.parseInt(outTime[1]));
+                long parkingTime = Duration.between(startTime, endTime).toMinutes();
+                carPerTime.put(car, carPerTime.getOrDefault(car, 0L) + parkingTime);
+                carStatus.put(car, null);
+            }
+        }
+
+        List<String> carList = new ArrayList<>(cars);
+        Collections.sort(carList);
+        answer = new int[carList.size()];
+        for (int i = 0; i < carList.size(); i++) {
+            String car = carList.get(i);
+            long time = carPerTime.get(car);
+            answer[i] = this.caculateFee(time, fees);
+        }
+
+
         return answer;
     }
 
-    public void init(int[] fees, String[] records) {
-        globalFees = fees;
-        globalRecords = records;
-        inAndOut = new HashMap<>();
-    }
+    private int caculateFee(long parkingTime, int[] fees) {
+        int basicTime = fees[0];
+        int basicPrice = fees[1];
+        int addTime = fees[2];
+        int addPrice = fees[3];
 
-    public int[] findAnswer() {
-        Map<String, Integer> sumTimePerCar = new HashMap<>();
-        List<String> carNumInteger = new ArrayList<>();
-        for (String record : globalRecords) {
-            String[] str = record.split(" ");
-            if (inAndOut.get(str[1]) == null) {
-                inAndOut.put(str[1], str[0] + " " + str[2] + " ");
+        if (parkingTime <= basicTime) {
+            return basicPrice;
+        }
+
+        int extraPrice = 0;
+        if (parkingTime > basicTime) {
+            int extraTime = (int) (parkingTime - basicTime);
+            if (extraTime % addTime == 0) {
+                extraPrice = extraTime / addTime * addPrice;
             } else {
-                inAndOut.put(str[1], inAndOut.get(str[1]) + str[0] + " " + str[2] + " ");
+                extraPrice = (extraTime / addTime + 1) * addPrice;
             }
-            if (!carNumInteger.contains(str[1])) {
-                carNumInteger.add(str[1]);
-            }
+
         }
 
-        // 오름차순으로 정렬
-        Collections.sort(carNumInteger);
-
-        // 나간 기록이 없는 차 23:59분 나감 처리
-        for (String inOut : carNumInteger) {
-            if (inAndOut.get(inOut).endsWith("IN ")) {
-                inAndOut.put(inOut, inAndOut.get(inOut) + "23:59 OUT");
-            }
-        }
-
-        // 누적 시간 계산해서 맵에 넣기
-        for (String num : carNumInteger) {
-            String string = inAndOut.get(num);
-            String[] re = string.split(" ");
-            // in out을 한 쌍으로 시간 계산, in만 있을 경우 out은 23:59분
-            // 10분으로 안나눠지면 올림해야함
-            for (int i = 0; i < re.length; i += 4) {
-                int timeSum = calculateTimeToMin(re[i + 2]) - calculateTimeToMin(re[i]);
-                if (sumTimePerCar.get(num) == null) {
-                    sumTimePerCar.put(num, timeSum);
-                    continue;
-                }
-                sumTimePerCar.put(num, sumTimePerCar.get(num) + timeSum);
-            }
-        }
-
-        // answer배열에 순서대로 넣어줘야함
-        int idx = 0;
-        int[] temp = new int[carNumInteger.size()];
-        for (String carNum : carNumInteger) {
-            temp[idx] = sumTimePerCar.get(carNum);
-            idx++;
-        }
-
-        return temp;
-    }
-
-    public int calculateTimeToMin(String curTime) {
-        String[] str = curTime.split(":");
-        int time = Integer.parseInt(str[0]) * 60;
-        int min = Integer.parseInt(str[1]);
-        return time + min;
+        return basicPrice + extraPrice;
     }
 }
