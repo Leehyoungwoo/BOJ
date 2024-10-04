@@ -19,14 +19,14 @@ class Solution {
         if (curR == r && curC == c) {
             if (k == 0) {
                 return way;
-            } else {
-                if (!remainWay(curR, curC, r, c, k)) {
-                    return "";
-                }
             }
         }
 
         if (!remainWay(curR, curC, r, c, k)) {
+            return "";
+        }
+
+        if (k <= 0) {
             return "";
         }
         for (int i = 0; i < direction.length; i++) {
