@@ -7,22 +7,10 @@ public class Main {
 
     private static int n;
     private static int[][] map;
-    private final static int[][] direction = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-    private static int total;
-    private static List<Integer> count = new ArrayList<>();
-    private static boolean[][] visited;
+    private static int[][] direction = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    private static Map<Integer, List<int[]>> villiges = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
-        init();
-        findAnswer();
-        System.out.println(total);
-        Collections.sort(count);
-        for (int i = 0; i < count.size(); i++) {
-            System.out.println(count.get(i));
-        }
-    }
-
-    private static void init() throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
         n = Integer.parseInt(input.readLine());
         map = new int[n][n];
@@ -32,42 +20,52 @@ public class Main {
                 map[i][j] = line.charAt(j) - '0';
             }
         }
-        visited = new boolean[n][n];
-    }
-
-    private static void findAnswer() {
+        int mark = 0;
+        boolean[][] visited = new boolean[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (!visited[i][j] && map[i][j] == 1) {
-                    caculateVilige(i, j, 1);
-                    total++;
+                if (map[i][j] != 0 && !visited[i][j]) {
+                    bfs(i, j, ++mark, visited);
                 }
             }
         }
+        StringBuilder answer = new StringBuilder();
+        answer.append(villiges.size()).append("\n");
+        List<Integer> list = new ArrayList<>();
+        for (Map.Entry<Integer, List<int[]>> entry : villiges.entrySet()) {
+            list.add(villiges.get(entry.getKey()).size());
+        }
+        Collections.sort(list);
+        for(Integer num : list) {
+            answer.append(num).append("\n");
+        }
+        System.out.println(answer);
     }
 
-    private static void caculateVilige(int curR, int curC, int cnt) {
+    private static void bfs(int r, int c,int mark, boolean[][] visited) {
+        List<int[]> list = new ArrayList<>();
         Queue<int[]> que = new LinkedList<>();
-        que.add(new int[]{curR, curC});
-        visited[curR][curC] = true;
-        while (!que.isEmpty()) {
+        que.offer(new int[]{r, c});
+        visited[r][c] = true;
+        list.add(new int[]{r, c});
+        while(!que.isEmpty()) {
             int[] cur = que.poll();
-            int r = cur[0];
-            int c = cur[1];
+            int curR = cur[0];
+            int curC = cur[1];
             for (int[] dir : direction) {
-                int nextR = r + dir[0];
-                int nextC = c + dir[1];
-                if (isInRange(nextR, nextC) && !visited[nextR][nextC] && map[nextR][nextC] == 1) {
-                    cnt++;
-                    que.add(new int[] {nextR, nextC});
-                    visited[nextR][nextC] = true;
+                int newR = curR + dir[0];
+                int newC = curC + dir[1];
+                if (isInRange(newR, newC) && !visited[newR][newC] && map[newR][newC] == 1) {
+                    que.offer(new int[] {newR, newC});
+                    visited[newR][newC] = true;
+                    list.add(new int[] {newR, newC});
                 }
             }
         }
-        count.add(cnt);
+        villiges.put(mark, list);
     }
 
-    private static boolean isInRange(int nextR, int nextC) {
-        return 0 <= nextR && nextR < n && 0 <= nextC && nextC < n;
+    private static boolean isInRange(int r, int c) {
+        return 0 <= r && r < n && 0 <= c && c < n;
     }
 }
