@@ -15,6 +15,7 @@ public class Main {
         fillArr();
         printArr();
         findTargetRC();
+        System.out.println(answer);
     }
 
     private static void fillArr() {
@@ -39,19 +40,18 @@ public class Main {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (arr[i][j] == target) {
-                    System.out.println((i + 1) + " " + (j + 1)); 
-                    return;
+                    answer.append(i + 1).append(" ").append(j + 1);
                 }
             }
         }
     }
 
     private static void printArr() {
-        for (int[] row : arr) {
-            for (int num : row) {
-                System.out.print(num + " ");
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                answer.append(arr[i][j]).append(" ");
             }
-            System.out.println();
+            answer.append("\n");
         }
     }
 }
