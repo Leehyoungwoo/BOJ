@@ -53,23 +53,23 @@ public class Main {
         }
 
         node = node.children.get(map[r][c]);
-        s += map[r][c];
+        s+= map[r][c];
 
-        // 단어의 끝에 도달했을 때
         if (node.endOfWord) {
-            set.add(s);  // 단어를 찾으면 set에 추가
+            set.add(s);
         }
 
-        // 더 이상 진행할 수 없으면 종료
         if (node.children.isEmpty()) {
             return false;
         }
+
 
         visited[r][c] = true;
         for (int[] dir : direction) {
             int nextR = r + dir[0];
             int nextC = c + dir[1];
-            isPossible(nextR, nextC, visited, node, s);  // 계속 탐색
+            if (isPossible(nextR, nextC, visited, node, s)) {
+            }
         }
 
         visited[r][c] = false;
