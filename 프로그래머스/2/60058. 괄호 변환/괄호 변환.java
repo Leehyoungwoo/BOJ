@@ -2,86 +2,83 @@ import java.util.*;
 
 class Solution {
     public String solution(String p) {
-        if (p.isEmpty()) {
+        String answer = "";
+        //입력이 빈 문자열인 경우, 빈 문자열을 반환
+        if (p.isBlank()) {
             return p;
         }
+        
         if (isCorrectString(p)) {
             return p;
         }
-        return changeStringToCorrectString(p);
+        
+        answer = changeStringToCorrectString(p);
+        return answer;
     }
-
+    
     private String changeStringToCorrectString(String p) {
         if (p.isEmpty()) {
             return "";
         }
-
-        // 1. u, v 분리
-        int splitIdx = getBalancedIndex(p);
-        String u = p.substring(0, splitIdx + 1);
-        String v = p.substring(splitIdx + 1);
-
-        // 2. u가 "올바른 괄호 문자열"인지 확인
+        int idx = findIdx(p);
+        String u = p.substring(0, idx + 1);
+        String v = p.substring(idx + 1);
         if (isCorrectString(u)) {
-            return u + changeStringToCorrectString(v); // v를 변환하여 붙이기
+            return u + changeStringToCorrectString(v);
         }
-
-        // 3. 올바르지 않다면 변환 과정 수행
-        StringBuilder newStr = new StringBuilder();
-        newStr.append("(");
-        newStr.append(changeStringToCorrectString(v));
-        newStr.append(")");
-
-        // 4. u의 첫 번째와 마지막 문자 제거 후 괄호 방향 뒤집기
+        StringBuilder newOne = new StringBuilder();
+        newOne.append('(');
+        newOne.append(changeStringToCorrectString(v));
+        newOne.append(')');
         u = u.substring(1, u.length() - 1);
-        u = reverseBrackets(u);
-        newStr.append(u);
-
-        return newStr.toString();
+        u = reverse(u);
+        newOne.append(u);
+        return newOne.toString();
     }
-
-    // "균형잡힌 괄호 문자열"의 인덱스를 찾는 함수
-    private int getBalancedIndex(String p) {
-        int left = 0, right = 0;
-        for (int i = 0; i < p.length(); i++) {
-            if (p.charAt(i) == '(') {
+    
+    private String reverse(String u) {
+        StringBuilder reverseOne = new StringBuilder();
+        for(int i = 0; i < u.length(); i++) {
+            char c = u.charAt(i);
+            if (c == '(') {
+                reverseOne.append(')');
+            } else {
+                reverseOne.append('(');
+            }
+        }
+        
+        return reverseOne.toString();
+    }
+    
+    private int findIdx(String p) {
+        int idx = 0;
+        int left = 0;
+        int right = 0;
+        for (char c : p.toCharArray()) {
+            if (c == '(') {
                 left++;
             } else {
                 right++;
             }
-            if (left == right) {
-                return i;
+            if (left != 0 && right != 0 && left == right) {
+                break;
             }
+            idx++;
         }
-        return p.length() - 1;
+        return idx;
     }
-
-    // "올바른 괄호 문자열"인지 확인하는 함수
+    
     private boolean isCorrectString(String p) {
         Stack<Character> stack = new Stack<>();
         for (char c : p.toCharArray()) {
-            if (c == '(') {
-                stack.push(c);
-            } else {
-                if (stack.isEmpty()) {
-                    return false;
+            if (c == ')') {
+                if (!stack.isEmpty() && stack.peek() == '(') {
+                    stack.pop();
                 }
-                stack.pop();
+                continue;
             }
+            stack.push(c);
         }
         return stack.isEmpty();
-    }
-
-    // 괄호 방향을 뒤집는 함수
-    private String reverseBrackets(String s) {
-        StringBuilder reversed = new StringBuilder();
-        for (char c : s.toCharArray()) {
-            if (c == '(') {
-                reversed.append(")");
-            } else {
-                reversed.append("(");
-            }
-        }
-        return reversed.toString();
     }
 }
