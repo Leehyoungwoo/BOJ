@@ -59,12 +59,12 @@ public class Main {
 
     private static int lowerBound(int[] arr, int target) {
         int left = 0;
-        int right = arr.length;
+        int right = arr.length - 1;
 
-        while (left < right) {
+        while (left <= right) {
             int mid = left + (right - left) / 2;
             if (arr[mid] >= target) {
-                right = mid;
+                right = mid - 1;
             } else {
                 left = mid + 1;
             }
