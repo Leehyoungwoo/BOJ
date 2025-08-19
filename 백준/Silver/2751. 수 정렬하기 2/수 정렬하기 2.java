@@ -4,7 +4,7 @@ import java.util.*;
 public class Main {
 
     private static int n;
-    private static List<Integer> nums;
+    private static boolean[] num;
 
     public static void main(String[] args) throws IOException {
         init();
@@ -14,17 +14,19 @@ public class Main {
     private static void init() throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
         n = Integer.parseInt(input.readLine());
-        nums = new ArrayList<>();
+        num = new boolean[2000001];
         for (int i = 0; i < n; i++) {
-            nums.add(Integer.parseInt(input.readLine()));
+            int number = Integer.parseInt(input.readLine());
+            num[number + 1000000] = true;
         }
-        Collections.sort(nums);
     }
 
     private static void findAnswer() {
         StringBuilder answer = new StringBuilder();
-        for (int i = 0; i < n; i++) {
-            answer.append(nums.get(i)).append("\n");
+        for (int i = 0; i < num.length; i++) {
+            if (num[i]) {
+                answer.append(i - 1000000).append("\n");
+            }
         }
 
         System.out.print(answer);
