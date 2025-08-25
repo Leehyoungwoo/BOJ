@@ -42,8 +42,8 @@ public class Main {
         int[] need = new int[n + 1];
         make(n, 1, need);
 
-        for (int i = 1; i < n; i++) {                
-            if (graph.get(i).isEmpty() && need[i] > 0) {  
+        for (int i = 1; i < n; i++) {
+            if (graph.get(i).isEmpty() && need[i] > 0) {
                 answer.append(i).append(" ").append(need[i]).append("\n");
             }
         }
@@ -53,24 +53,23 @@ public class Main {
 
     private static void make(int product, int quantity, int[] need) {
         int partCount = graph.size() - 1;
-        int[] required = new int[partCount + 1];
-        boolean[] inQueue = new boolean[partCount + 1];
+        int[] required = new int[partCount + 1];  
         Queue<Integer> queue = new LinkedList<>();
 
         required[product] = quantity;
         queue.offer(product);
-        inQueue[product] = true;
 
         while (!queue.isEmpty()) {
             int part = queue.poll();
-            inQueue[part] = false;
 
             int amount = required[part];
-            required[part] = 0;
-            if (amount == 0) continue;
+            if (amount == 0) continue; 
+            // 필요한 부품 수가 다른 재료와 섞이면 안되기 때문에 사용하면 0으로 초기화해줘야 함
+            required[part] = 0;        
 
+            // 기본 재료
             if (graph.get(part).isEmpty()) {
-                need[part] += amount;
+                need[part] += amount;  
                 continue;
             }
 
@@ -78,11 +77,7 @@ public class Main {
                 int subPart = sub[0];
                 int subCount = sub[1];
                 required[subPart] += amount * subCount;
-
-                if (!inQueue[subPart]) {
-                    queue.offer(subPart);
-                    inQueue[subPart] = true;
-                }
+                queue.offer(subPart); 
             }
         }
     }
