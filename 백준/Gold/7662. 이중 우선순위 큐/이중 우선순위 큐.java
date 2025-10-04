@@ -51,38 +51,33 @@ public class Main {
             } else {
                 if (s[1].equals("1")) {
                     // 최댓값 삭제
-                    while (!maxHeap.isEmpty() && max.containsKey(maxHeap.peek()) && max.get(maxHeap.peek()) > 0) {
-                        int target = maxHeap.poll();
-                        max.put(target, max.get(target) - 1);
-                    }
+                    lazyDelete(maxHeap, max);
                     if (maxHeap.isEmpty()) continue;
                     int target = maxHeap.poll();
                     min.put(target, min.getOrDefault(target, 0) + 1);
                 } else {
                     // 최솟값 삭제
-                    while (!minHeap.isEmpty() && min.containsKey(minHeap.peek()) && min.get(minHeap.peek()) > 0) {
-                        int target = minHeap.poll();
-                        min.put(target, min.get(target) - 1);
-                    }
+                    lazyDelete(minHeap, min);
                     if (minHeap.isEmpty()) continue;
                     int target = minHeap.poll();
                     max.put(target, max.getOrDefault(target, 0) + 1);
                 }
             }
         }
-        while (!maxHeap.isEmpty() && max.getOrDefault(maxHeap.peek(), 0) > 0) {
-            int target = maxHeap.poll();
-            max.put(target, max.get(target) - 1);
-        }
-        while (!minHeap.isEmpty() && min.getOrDefault(minHeap.peek(), 0) > 0) {
-            int target = minHeap.poll();
-            min.put(target, min.get(target) - 1);
-        }
+        lazyDelete(maxHeap, max);
+        lazyDelete(minHeap, min);
 
         if (minHeap.isEmpty() || maxHeap.isEmpty()) {
             return "EMPTY";
         }
 
         return maxHeap.peek() + " " + minHeap.peek();
+    }
+
+    private static void lazyDelete(PriorityQueue<Integer> heap, Map<Integer, Integer> map) {
+        while (!heap.isEmpty() && map.getOrDefault(heap.peek(), 0) > 0) {
+            int target = heap.poll();
+            map.put(target, map.get(target) - 1);
+        }
     }
 }
