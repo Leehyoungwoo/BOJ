@@ -33,12 +33,12 @@ public class Main {
         Arrays.sort(card);
         for (int i = 0; i < m; i++) {
             int target = signal[i];
-            int exist = binarySearch(target);
-            if (exist == -1) {
+            int low = binarySearchLowerBound(target);
+            int up = binarySearchUpperBound(target);            
+            if (low == up) {
                 answer.append(0).append(" ");
             } else {
-                int low = binarySearchLowerBound(target);
-                int up = binarySearchUpperBound(target);
+                
                 answer.append(up - low).append(" ");
             }
         }
