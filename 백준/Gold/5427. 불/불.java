@@ -7,7 +7,7 @@ public class Main {
     private static char[][] map;
     private static int w, h;
     private static int[] start;
-    private static Queue<int[]> fire;
+    private static Deque<int[]> fire;
     private static final int[][] direction = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
     private static boolean[][] fv;
 
@@ -36,7 +36,7 @@ public class Main {
         // 불이 번짐에 따라서 상근이 이동할 수 없으면 그냥 그대로
         // 매 순차마다 상근이 도착했는지 여부를 체크하고 time 갱신
         // time 갱신이 이뤄지지 않았으면 IMPOSSIBLE
-        Queue<int[]> sangeun = new LinkedList<>();
+        Deque<int[]> sangeun = new ArrayDeque<>();
         sangeun.add(new int[]{start[0], start[1], 0});
         boolean[][] fv = new boolean[h][w];
         boolean[][] sv = new boolean[h][w];
@@ -98,7 +98,7 @@ public class Main {
         h = Integer.parseInt(tokenizer.nextToken());
         map = new char[h][w];
         fv = new boolean[h][w];
-        fire = new LinkedList<>();
+        fire = new ArrayDeque<>();
         start = new int[2];
         for (int i = 0; i < h; i++) {
             String line = input.readLine();
