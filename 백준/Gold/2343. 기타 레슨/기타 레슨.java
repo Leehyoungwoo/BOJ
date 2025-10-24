@@ -30,9 +30,9 @@ public class Main {
         //
         int left = 0;
         int right = Arrays.stream(time).sum();
-        for (int t : time) {
-            left = Math.max(left, t);
-        }
+//        for (int t : time) {
+//            left = Math.max(left, t);
+//        }
         while (left <= right) {
             int mid = left + (right - left) / 2;
             // 지금 가능하면 더 줄여보자
@@ -51,6 +51,8 @@ public class Main {
         int sum = 0;
         int count = 0;
         for (int i = 0; i < n; i++) {
+            if (target < time[i]) return false;
+            
             if (sum + time[i] <= target) {
                 sum += time[i];
             } else {
