@@ -1,86 +1,80 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 public class Main {
 
-    private final static int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-    private static int n;
-    private static int m;
+    private static int n, m;
     private static int[][] map;
-    private static int notTomatos;
-    private static int answer = Integer.MAX_VALUE;
-    private static Queue<int[]> que = new LinkedList<>();
+    private static boolean flag;
+    private static Queue<int[]> que;
     private static boolean[][] visited;
-
+    private static final int[][] direction = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
     public static void main(String[] args) throws IOException {
         init();
         findAnswer();
     }
 
-    private static void init() throws IOException {
-        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer tokenizer = new StringTokenizer(input.readLine());
-        n = Integer.parseInt(tokenizer.nextToken());
-        m = Integer.parseInt(tokenizer.nextToken());
-        map = new int[m][n];
-        visited = new boolean[m][n];
-        for (int i = 0; i < m; i++) {
-            tokenizer = new StringTokenizer(input.readLine());
-            for (int j = 0; j < n; j++) {
-                map[i][j] = Integer.parseInt(tokenizer.nextToken());
-                if (map[i][j] == 1) {
-                    que.add(new int[]{i, j, 0});
-                    visited[i][j] = true;
-                }
-                if (map[i][j] == -1) {
-                    notTomatos++;
-                }
-            }
-        }
-    }
-
     private static void findAnswer() {
-        int sum = que.size();
-        sum = bfs(sum);
-        if (sum != n * m - notTomatos) {
-            System.out.println(-1);
-            return;
-        }
-        if(answer == Integer.MAX_VALUE) {
+        if (flag) {
             System.out.println(0);
             return;
         }
-        System.out.println(answer);
-    }
 
-    private static int bfs(int sum) {
+        int time = 0;
         while (!que.isEmpty()) {
-            int[] cur = que.poll();
-            int r = cur[0];
-            int c = cur[1];
-            int depth = cur[2];
-            for (int[] dir : directions) {
-                int nr = r + dir[0];
-                int nc = c + dir[1];
-                int newDepth = depth + 1;
-                if (isInRange(nr, nc) && !visited[nr][nc] && map[nr][nc] == 0) {
-                    sum++;
-                    que.offer(new int[]{nr, nc, newDepth});
-                    visited[nr][nc] = true;
-                    if (sum == n * m - notTomatos) {
-                        answer = Math.min(answer, depth + 1);
+            int size = que.size();
+            while (size -- > 0) {
+                int[] cur = que.poll();
+                for (int[] dir : direction) {
+                    int nextR = cur[0] + dir[0];
+                    int nextC = cur[1] + dir[1];
+                    if (isInRange(nextR, nextC) && !visited[nextR][nextC] && map[nextR][nextC] != -1) {
+                        que.offer(new int[] {nextR, nextC});
+                        visited[nextR][nextC] = true;
+                        map[nextR][nextC] = 1;
                     }
+                }
+            }
+            time++;
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (map[i][j] == 0) {
+                    System.out.println(-1);
+                    return;
                 }
             }
         }
 
-        return sum;
+        System.out.println(time - 1);
     }
 
-    private static boolean isInRange(int nr, int nc) {
-        return 0 <= nr && nr < m && 0 <= nc && nc < n;
+    private static boolean isInRange(int r, int c) {
+        return 0 <= r && r < n && 0 <= c && c < m;
+    }
+
+    private static void init() throws IOException {
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer tokenizer = new StringTokenizer(input.readLine());
+        m = Integer.parseInt(tokenizer.nextToken());
+        n = Integer.parseInt(tokenizer.nextToken());
+        map = new int[n][m];
+        que = new LinkedList<>();
+        visited = new boolean[n][m];
+
+        for (int i = 0; i < n; i++) {
+            tokenizer = new StringTokenizer(input.readLine());
+            for (int j = 0; j < m; j++) {
+                map[i][j] = Integer.parseInt(tokenizer.nextToken());
+                if (map[i][j] == 1) {
+                    que.add(new int[] {i, j});
+                    visited[i][j] = true;
+                }
+            }
+        }
+
+        flag = que.size() == n * m;
     }
 }
