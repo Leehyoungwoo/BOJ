@@ -1,178 +1,136 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-
-class Camera {
-	int row;
-	int col;
-	int type;
-
-	public Camera(int row, int col, int type) {
-		this.row = row;
-		this.col = col;
-		this.type = type;
-	}
-}
+import java.io.*;
+import java.util.*;
 
 public class Main {
 
-	private static final int WALL = 6;
-	private static int N;
-	private static int M;
-	private static int[][] map;
-	private static List<Camera> cctvs = new ArrayList<>();
-	private static int[] per;
-	private static int minBlind;
+    private static int n, m;
+    private static int[][] map;
+    private static Map<Integer, List<int[]>> index;
+    private static List<int[]> camera;
+    private static int[][] direction = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    private static int[] look;
+    private static int minSafe;
 
-	public static void main(String[] args) throws IOException {
-		init();
-		dfs(0);
-		System.out.println(minBlind);
-	}
+    public static void main(String[] args) throws IOException {
+        init();
+        int answer = findAnswer();
 
-	private static void init() throws IOException {
-		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer tokenizer = new StringTokenizer(input.readLine());
-		N = Integer.parseInt(tokenizer.nextToken());
-		M = Integer.parseInt(tokenizer.nextToken());
-		minBlind = N * M;
+        System.out.println(answer);
+    }
 
-		map = new int[N][M];
-		for (int i = 0; i < map.length; i++) {
-			tokenizer = new StringTokenizer(input.readLine());
-			for (int j = 0; j < map[i].length; j++) {
-				map[i][j] = Integer.parseInt(tokenizer.nextToken());
-				if (map[i][j] != 0 && map[i][j] != WALL) {
-					cctvs.add(new Camera(i, j, map[i][j]));
-				}
-				if (map[i][j] != 0) {
-					minBlind--;
-				}
-			}
-		}
-		per = new int[cctvs.size()];
-	}
+    private static void init() throws IOException {
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer tokenizer = new StringTokenizer(input.readLine());
+        n = Integer.parseInt(tokenizer.nextToken());
+        m = Integer.parseInt(tokenizer.nextToken());
 
-	private static void dfs(int idx) {
-		if (idx == cctvs.size()) {
-			int[][] temp = copyMap();
-			int blindSpot = findSpot(temp);
-			minBlind = Math.min(minBlind, blindSpot);
-			return;
-		}
+        map = new int[n][m];
+        index = new HashMap<>();
+        camera = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            tokenizer = new StringTokenizer(input.readLine());
+            for (int j = 0; j < m; j++) {
+                map[i][j] = Integer.parseInt(tokenizer.nextToken());
+                if (map[i][j] >= 1 && map[i][j] <= 5) {
+                    camera.add(new int[]{map[i][j], i, j});
+                }
+            }
+        }
+        look = new int[camera.size()];
+        // 카메라별 방향 세팅
+        for (int i = 1; i <= 5; i++) {
+            index.putIfAbsent(i, new ArrayList<>());
+        }
+        index.get(1).addAll(Arrays.asList(new int[]{0}, new int[]{1}, new int[]{2}, new int[]{3}));
+        index.get(2).addAll(Arrays.asList(new int[]{0, 1}, new int[]{2, 3}));
+        index.get(3).addAll(Arrays.asList(new int[]{0, 2}, new int[]{0, 3}, new int[]{1, 2}, new int[]{1, 3}));
+        index.get(4).addAll(Arrays.asList(new int[]{0, 1, 2}, new int[]{0, 1, 3}, new int[]{0, 2, 3}, new int[]{1, 2, 3}));
+        index.get(5).addAll(Arrays.asList(new int[]{0, 1, 2, 3}));
+    }
 
-		for (int i = 0; i < 4; i++) {
-			per[idx] = i;
-			dfs(idx + 1);
-		}
-	}
+    // 단방향, 양방향, 90도, 삼방향, 사방향 감시 가능한 카메라가 있음
+    // 카메라 인덱스는 각각  1 ~ 5
+    // 6은 벽
+    //CCTV는 CCTV를 통과 가능
+    // 사각지대는?
+    // 1번은 4방향, 2번은 두방향, 3번 네방향, 4번 두방향, 5번 1방향 나옴
+    // 리스트에 감시카메라는 담아뒀으니까 방향만 정해서 배열에 담아두고
+    // 마지막에 방향 결졍되었으면 리스트와 방향을 함께 순회하면서 감시구역 채우면 될듯?
+    private static int findAnswer() {
+        minSafe = Integer.MAX_VALUE;
+        dfs(0);
 
-	private static int[][] copyMap() {
-		int[][] temp = new int[N][M];
+        return minSafe;
+    }
 
-		for (int i = 0; i < temp.length; i++) {
-			for (int j = 0; j < temp[i].length; j++) {
-				temp[i][j] = map[i][j];
-			}
-		}
+    private static void dfs(int idx) {
+        if (idx == camera.size()) {
+            int safeArea = countArea();
+            minSafe = Math.min(minSafe, safeArea);
+            return;
+        }
 
-		return temp;
-	}
+        for (int i = 0; i < index.get(camera.get(idx)[0]).size(); i++) {
+            look[idx] = i;
+            dfs(idx + 1);
+        }
+    }
 
-	private static int findSpot(int[][] temp) {
-		for (int i = 0; i < cctvs.size(); i++) {
-			int dir = per[i];
-			Camera cur = cctvs.get(i);
-			watching(dir, cur, temp);
-		}
+    private static int countArea() {
+        boolean[][] visited = new boolean[n][m];
+        for (int i = 0; i < look.length; i++) {
+            int cameraNumber = camera.get(i)[0];
+            int[] dir = index.get(cameraNumber).get(look[i]);
+            for (int d : dir) {
+                int curR = camera.get(i)[1];
+                int curC = camera.get(i)[2];
+                while (true) {
+                    int nextR = curR + direction[d][0];
+                    int nextC = curC + direction[d][1];
 
-		int unWatch = 0;
-		for (int i = 0; i < temp.length; i++) {
-			for (int j = 0; j < temp[i].length; j++) {
-				if (temp[i][j] == 0) {
-					unWatch++;
-				}
-			}
-		}
+                    if (!isInRange(nextR, nextC)) break;
 
-		return unWatch;
-	}
+                    if (map[nextR][nextC] == 6) break;
 
-	private static void watching(int direction, Camera cur, int[][] temp) {
-		int[][] dir = decideDir(direction, cur);
-		int curR = cur.row;
-		int curC = cur.col;
+                    visited[nextR][nextC] = true;
+                    curR = nextR;
+                    curC = nextC;
+                }
+            }
+        }
+        int count = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (map[i][j] == 0 && !visited[i][j]) {
+                    count++;
+                }
+            }
+        }
+//        if (count == 1) {
+//            pringArr(visited);
+//        }
 
-		for (int[] d : dir) {
-			watch(curR, curC, d, temp);
-		}
-	}
+        return count;
+    }
 
-	private static void watch(int curR, int curC, int[] d, int[][] temp) {
-		int nextR = curR + d[0];
-		int nextC = curC + d[1];
-		if (isInRange(nextR, nextC) && map[nextR][nextC] != WALL) {
-			temp[nextR][nextC] = -1;
-			watch(nextR, nextC, d, temp);
-		}
-	}
+    private static void pringArr(boolean[][] visited) {
+        StringBuilder print = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (map[i][j] == 0 && !visited[i][j]) {
+                    print.append("O" + " ");
+                } else {
+                    print.append("X" + " ");
+                }
+            }
+            print.append("\n");
+        }
 
-	private static int[][] decideDir(int dir, Camera cur) {
-		final int[][] direction = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
-		int type = cur.type;
+        System.out.println(print);
 
-		if (type == 1) {
-			return new int[][] { direction[dir] };
-		}
+    }
 
-		if (type == 2) {
-			if (dir == 0 || dir == 1) {
-				return new int[][] { { 1, 0 }, { -1, 0 } };
-			}
-			if (dir == 2 || dir == 3) {
-				return new int[][] { { 0, 1 }, { 0, -1 } };
-			}
-		}
-
-		if (type == 3) {
-			if (dir == 0) {
-				return new int[][] { { 1, 0 }, { 0, -1 } };
-			}
-			if (dir == 1) {
-				return new int[][] { { -1, 0 }, { 0, 1 } };
-			}
-			if (dir == 2) {
-				return new int[][] { { 0, 1 }, { 1, 0 } };
-			}
-			if (dir == 3) {
-				return new int[][] { { 0, -1 }, { -1, 0 } };
-			}
-		}
-
-		if (type == 4) {
-			if (dir == 0) {
-				return new int[][] { { 1, 0 }, { 0, -1 }, { 0, 1 } };
-			}
-			if (dir == 1) {
-				return new int[][] { { 1, 0 }, { 0, 1 }, { -1, 0 } };
-			}
-			if (dir == 2) {
-				return new int[][] { { -1, 0 }, { 0, -1 }, { 0, 1 } };
-			}
-			if (dir == 3) {
-				return new int[][] { { -1, 0 }, { 0, -1 }, { 1, 0 } };
-			}
-
-		}
-
-		return direction;
-	}
-
-	private static boolean isInRange(int row, int col) {
-		return 0 <= row && row < N && 0 <= col && col < M;
-	}
-
+    private static boolean isInRange(int r, int c) {
+        return 0 <= r && r < n && 0 <= c && c < m;
+    }
 }
