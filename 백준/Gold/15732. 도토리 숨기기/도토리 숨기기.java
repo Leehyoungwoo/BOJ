@@ -45,9 +45,9 @@ public class Main {
         while (left < right) {
             int mid = left + (right - left) / 2;
             if (findCount(mid)) {
-                right = mid;
-            } else {
                 left = mid + 1;
+            } else {
+                right = mid;
             }
         }
 
@@ -61,12 +61,11 @@ public class Main {
             int to = Math.min(rules[i][1], mid);
             int gap = rules[i][2];
             // 씰링으로 더해주자
-            if (to >= from) {
-                count += ((long) to - from + gap) / gap;
-                if (count >= d) return true;
-            }
+            if (to < from) continue;
+
+            count += ((long) to - from + gap) / gap;
         }
 
-        return count >= d;
+        return count < d;
     }
 }
