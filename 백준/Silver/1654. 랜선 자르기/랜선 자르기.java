@@ -1,44 +1,62 @@
-import java.util.*;
 import java.io.*;
+import java.util.*;
+import java.math.*;
 
 public class Main {
+
+    private static int k, n;
+    private static long[] len;
+
     public static void main(String[] args) throws IOException {
-        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(input.readLine());
+        init();
+        long answer = findAnswer();
 
-        int K = Integer.parseInt(st.nextToken());
-        int N = Integer.parseInt(st.nextToken());
+        System.out.println(answer);
+    }
 
-        long[] lengths = new long[K];
-        long maxLen = 0;
-
-        for (int i = 0; i < K; i++) {
-            lengths[i] = Long.parseLong(input.readLine());
-            if (lengths[i] > maxLen) {
-                maxLen = lengths[i];
-            }
-        }
-
+    private static long findAnswer() {
+        // 자체적으로 K개의 랜선 가지고 있는데 N개의 같은 길이의 랜선으로 만들고 싶음
+        // 300cm 짜리 랜선에서 140cm 짜리 랜선을 두 개 잘라내면 20cm는 버려야 한다
         long left = 1;
-        long right = maxLen;
-        long result = 0;
-
+        long right = Arrays.stream(len)
+                .max()
+                .getAsLong();
+        // 만들 수 있는 최대 랜선의 길이를 구해야하면
+        long answer = 0;
         while (left <= right) {
-            long mid = (left + right) / 2;
-            long count = 0;
-
-            for (long length : lengths) {
-                count += (length / mid);
-            }
-
-            if (count >= N) {
-                result = mid;
+            long mid = left + (right - left) / 2;
+            if (isPossibleToCut(mid)) {
+                answer = mid;
                 left = mid + 1;
             } else {
                 right = mid - 1;
             }
         }
 
-        System.out.println(result);
+        return answer;
+    }
+
+    private static boolean isPossibleToCut(long mid) {
+        long sum = 0;
+        for (int i = 0; i < len.length; i++) {
+            sum += (len[i] / mid);
+            if (sum >= n) {
+                return true;
+            }
+        }
+
+        return sum >= n;
+    }
+
+    private static void init() throws IOException {
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer tokenizer = new StringTokenizer(input.readLine());
+        k = Integer.parseInt(tokenizer.nextToken());
+        n = Integer.parseInt(tokenizer.nextToken());
+        len = new long[k];
+        for (int i = 0; i < k; i++) {
+            tokenizer = new StringTokenizer(input.readLine());
+            len[i] = Integer.parseInt(tokenizer.nextToken());
+        }
     }
 }
