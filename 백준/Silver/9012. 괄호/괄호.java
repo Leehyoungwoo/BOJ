@@ -1,46 +1,50 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
+import java.math.*;
 
 public class Main {
 
-    private static Queue<Character> queue = new LinkedList<>();
-    private static int T;
-    private static String s;
+    private static int n;
+    private static String[] order;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb = new StringBuilder();
-        T = Integer.parseInt(br.readLine());
+        init();
+        String answer = findAnswer();
 
-        for (int tc = 1; tc <= T; tc++) {
-            s = br.readLine();
-            sb.append(findAnswer()).append("\n");
-            queue.clear();
-        }
-        System.out.println(sb);
+        System.out.println(answer);
+    }
+
+    private static void init() throws IOException {
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        n = Integer.parseInt(input.readLine());
+        order = new String[n];
+        for (int i = 0; i < n; i++) order[i] = input.readLine();
     }
 
     private static String findAnswer() {
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-
-            if(queue.size() != 0 && isMatched(c)) {
-                queue.poll();
-                continue;
-            }
-            queue.add(c);
+        StringBuilder answer = new StringBuilder();
+        for (int i = 0; i < order.length; i++) {
+            String output = selectYesOrNo(order[i]);
+            answer.append(output).append("\n");
         }
 
-        if(queue.size() != 0 ) {
-            return "NO";
-        } else {
-            return "YES";
-        }
+        return answer.toString();
     }
 
-    private static boolean isMatched(char c) {
-        return c == ')' && queue.peek() == '(';
+    private static String selectYesOrNo(String s) {
+        Stack<Character> stack = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(') {
+                stack.push(c);
+            } else {
+                if (stack.isEmpty()) {
+                    return "NO";
+                }
+                stack.pop();
+            }
+        }
+
+        return stack.isEmpty() ? "YES" : "NO";
     }
 }
