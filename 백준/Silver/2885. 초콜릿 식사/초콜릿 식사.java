@@ -1,41 +1,30 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder answer = new StringBuilder();
-        int k = Integer.parseInt(input.readLine());
+        int K = Integer.parseInt(input.readLine());
 
-        int chocho = 1;
-        while (chocho < k) {
-            chocho *= 2;
+        int size = 1;
+        while (size < K) {
+            size <<= 1;
         }
-        answer.append(chocho).append(" ");
 
-        int remaining = chocho;
-        int divide = 0;
-        int mine = 0;
+        int cut = 0;
+        int cur = size;
+        int sum = 0;
 
-        if (chocho == k) {
-            answer.append(0).append(" ");
-            System.out.println(answer);
-            return;
-        }
-        while (mine != k) {
-            if (mine + remaining / 2 <= k) {
-                mine += remaining / 2;
-                remaining /= 2;
-                divide++;
+        while (sum != K) {
+            if (sum + cur <= K) {
+                sum += cur;
             } else {
-                remaining /= 2;
-                divide++;
+                cur >>= 1;
+                cut++;
             }
         }
 
-        answer.append(divide);
-        System.out.println(answer);
+        System.out.println(size + " " + cut);
     }
 }
