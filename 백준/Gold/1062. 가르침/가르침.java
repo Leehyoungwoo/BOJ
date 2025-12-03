@@ -1,20 +1,17 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
+import java.math.*;
 
 public class Main {
 
-    private static int n;
-    private static int k;
-    private static String[] words;
-    private static int max = 0;
-    private static boolean[] learned;
+    private static int n, k;
+    private static String[] word;
+    private static int learned;
+    private static int max;
 
     public static void main(String[] args) throws IOException {
         init();
-        findMax(0, 0);
-        System.out.println(max);
+        findAnswer();
     }
 
     private static void init() throws IOException {
@@ -22,47 +19,70 @@ public class Main {
         StringTokenizer tokenizer = new StringTokenizer(input.readLine());
         n = Integer.parseInt(tokenizer.nextToken());
         k = Integer.parseInt(tokenizer.nextToken());
-        words = new String[n];
+        word = new String[n];
         for (int i = 0; i < n; i++) {
-            words[i] = input.readLine();
+            word[i] = input.readLine();
         }
-        if (k < 5) {
-            System.out.println(0);
-            System.exit(0);
+        String base = "antic";
+        for (int i = 0; i < base.length(); i++) {
+            char c = base.charAt(i);
+            learned |= (1 << (c - 'a'));
         }
-        // 기본 알파벳 배움 체크
-        learned = new boolean[26];
-        for (int i = 0; i < "antatica".length(); i++) {
-            learned["antatica".charAt(i) - 'a'] = true;
-        }
-        k -= 5;
     }
 
-    private static void findMax(int idx, int count) {
-        if (count == k) {
-            int readable = 0;
-            for (String word : words) {
-                boolean canRead = true;
-                for (char c : word.toCharArray()) {
-                    if (!learned[c - 'a']) {
-                        canRead = false;
-                        break;
-                    }
-                }
-                if (canRead) {
-                    readable++;
-                }
-            }
-            max = Math.max(max, readable);
+    private static void findAnswer() {
+        if (k < 5) {
+            System.out.println(0);
             return;
         }
 
-        for (int i = idx; i < 26; i++) {
-            if (!learned[i]) {
-                learned[i] = true;
-                findMax(i + 1, count + 1);
-                learned[i] = false;
+        if (k == 26) {
+            System.out.println(n);
+            return;
+        }
+
+        max = Integer.MIN_VALUE;
+        findMax(0, learned, k - 5);
+
+        System.out.println(max);
+    }
+
+    private static void findMax(int idx, int learned, int left) {
+        if (left == 0) {
+            int count = countReadable(learned);
+            max = Math.max(max, count);
+            return;
+        }
+
+        if (idx == 26) {
+            return;
+        }
+
+        if ((learned & (1 << idx)) != 0) {
+            findMax(idx + 1, learned, left);
+            return;
+        }
+
+        findMax(idx + 1, learned | (1 << idx), left - 1);
+
+        findMax(idx + 1, learned, left);
+    }
+
+    private static int countReadable(int learned) {
+        int count =0;
+        for (String w : word) {
+            boolean flag = false;
+            for (int i = 0; i < w.length(); i++) {
+                char c = w.charAt(i);
+                if ((learned & (1 << (c - 'a'))) == 0) {
+                    flag = true;
+                }
+            }
+            if (!flag) {
+                count++;
             }
         }
+
+        return count;
     }
 }
