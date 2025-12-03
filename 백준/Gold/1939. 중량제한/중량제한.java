@@ -1,18 +1,18 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 public class Main {
 
-    private static int n, m;
-    private static List<int[]> edge;
-    private static int[] fac;
-    private static int[] parent;
+    private static int n;
+    private static int m;
+    private static int start, end;
+    private static List<List<int[]>> graph;
 
     public static void main(String[] args) throws IOException {
         init();
-        findAnswer();
+        int answer = findAnswer();
+
+        System.out.println(answer);
     }
 
     private static void init() throws IOException {
@@ -20,56 +20,60 @@ public class Main {
         StringTokenizer tokenizer = new StringTokenizer(input.readLine());
         n = Integer.parseInt(tokenizer.nextToken());
         m = Integer.parseInt(tokenizer.nextToken());
-        edge = new ArrayList<>();
+        graph = new ArrayList<>();
+
+        for (int i = 0; i <= n; i++) {
+            graph.add(new ArrayList<>());
+        }
+
         for (int i = 0; i < m; i++) {
             tokenizer = new StringTokenizer(input.readLine());
             int a = Integer.parseInt(tokenizer.nextToken());
             int b = Integer.parseInt(tokenizer.nextToken());
             int c = Integer.parseInt(tokenizer.nextToken());
-            edge.add(new int[]{a, b, c});
+            graph.get(a).add(new int[]{b, c});
+            graph.get(b).add(new int[]{a, c});
         }
-        edge.sort((e1, e2) -> Integer.compare(e2[2], e1[2]));
-        fac = new int[2];
+
         tokenizer = new StringTokenizer(input.readLine());
-        for (int i = 0; i < 2; i++) {
-            fac[i] = Integer.parseInt(tokenizer.nextToken());
-        }
-        parent = new int[n + 1];
-        for (int i = 0; i <= n; i++) {
-            parent[i] = i;
-        }
+        start = Integer.parseInt(tokenizer.nextToken());
+        end = Integer.parseInt(tokenizer.nextToken());
     }
 
-    private static void findAnswer() {
-        int fac1 = fac[0];
-        int fac2 = fac[1];
+    private static int findAnswer() {
+        int[] dist = new int[n + 1];
+        Arrays.fill(dist, 0);
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> b[1] - a[1]);
 
-        for (int[] e : edge) {
-            int u = e[0];
-            int v = e[1];
-            int w = e[2];
-            union(u, v);
-            if (find(fac1) == find(fac2)) {
-                System.out.println(w);
-                return;
+        dist[start] = 0;
+        pq.offer(new int[]{start, Integer.MAX_VALUE});
+
+        while (!pq.isEmpty()) {
+            int[] cur = pq.poll();
+            int curNode =  cur[0];
+            int curCost = cur[1];
+
+            if (dist[curNode] > curCost) {
+                continue;
+            }
+
+            if (curNode == end) {
+                return curCost;
+            }
+
+            for (int[] next : graph.get(curNode)) {
+                int nextNode =   next[0];
+                int limit = next[1];
+
+                int possible = Math.min(curCost, limit);
+
+                if (dist[nextNode] < possible) {
+                    dist[nextNode] = possible;
+                    pq.offer(new int[]{nextNode, possible});
+                }
             }
         }
-    }
 
-    private static void union(int a, int b) {
-        int rootA = find(a);
-        int rootB = find(b);
-        if (rootA < rootB) {
-            parent[rootB] = rootA;
-            return;
-        }
-        parent[rootA] = rootB;
-    }
-
-    private static int find(int a) {
-        if (a == parent[a]) {
-            return a;
-        }
-        return parent[a] = find(parent[a]);
+        return 0;
     }
 }
