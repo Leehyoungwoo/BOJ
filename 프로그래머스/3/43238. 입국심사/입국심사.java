@@ -2,27 +2,33 @@ import java.util.*;
 
 class Solution {
     public long solution(int n, int[] times) {
+        // 최소 시간을 구해야함 
+        // 시간 = mid
         Arrays.sort(times);
-        long left = 0;
-        long right = (long) times[0] * n;        
-        while (left < right) {
+        long answer = 0;
+        long left = 1;
+        long right = (long)n * times[times.length - 1];
+        
+        while (left <=right) {
             long mid = left + (right - left) / 2;
-            if (isValid(mid, n, times)) {
-                left = mid + 1;
+            if (isPossibleTime(mid, n, times)) {
+                answer = mid;
+                right = mid - 1;
             } else {
-                right = mid;
+                left = mid + 1;
             }
         }
         
-        return left;
+        return answer;
     }
     
-    private boolean isValid(long target, int n, int[] times) {
+    private boolean isPossibleTime(long targetTime, int people, int[] times) {
         long sum = 0;
-        for (int time : times) {
-            sum+=target / time;
+        for (int i = 0; i < times.length; i++) {
+            sum += targetTime / times[i];
+            if (sum >= people) return true; 
         }
         
-        return sum < n;
+        return sum >= people;
     }
 }
