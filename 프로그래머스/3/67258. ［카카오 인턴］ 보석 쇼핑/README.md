@@ -1,10 +1,10 @@
 # [level 3] [카카오 인턴] 보석 쇼핑 - 67258 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/67258) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/67258?gad_source=1&gad_campaignid=22366107751&gbraid=0AAAAAC_c4nAcB8Otfrkxl7pROsWdmEKYx&gclid=CjwKCAiAu67KBhAkEiwAY0jAlXzIa476A9kglmkWjhskIfy3LHOThBXtt-hq1hXCQHFN1Cq0-AwWLhoC_NcQAvD_BwE) 
 
 ### 성능 요약
 
-메모리: 82.5 MB, 시간: 77.98 ms
+메모리: 78 MB, 시간: 67.39 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 10월 09일 17:01:23
+2025년 12월 25일 17:05:58
 
 ### 문제 설명
 
