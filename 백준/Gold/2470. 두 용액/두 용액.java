@@ -1,52 +1,58 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Main {
 
+    private static int n;
+    private static int[] num;
+
     public static void main(String[] args) throws IOException {
-        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-        int n = Integer.parseInt(input.readLine());
-        int[] nums = new int[n];
-        
-        StringTokenizer tokenizer = new StringTokenizer(input.readLine());
-        for (int i = 0; i < n; i++) {
-            nums[i] = Integer.parseInt(tokenizer.nextToken());
-        }
-        
-        Arrays.sort(nums);
-        
+        init();
+        int[] answer = findAnswer();
+
+        System.out.println(num[answer[0]] + " " + num[answer[1]]);
+    }
+
+    private static int[] findAnswer() {
+        Arrays.sort(num);
+        // 투포인터로 풀어보자
         int left = 0;
-        int right = n - 1;
-        int minAbsSum = Integer.MAX_VALUE;
-        int recordL = 0;
-        int recordR = 0;
-        
+        int right = n -1;
+        int[] best = new int[2];
+        int bestMin = Integer.MAX_VALUE;
+
         while (left < right) {
-            int sum = nums[left] + nums[right];
-            int absSum = Math.abs(sum);
-            
-            if (absSum < minAbsSum) {
-                minAbsSum = absSum;
-                recordL = nums[left];
-                recordR = nums[right];
+            int sum = num[left] + num[right];
+            int abs = Math.abs(sum);
+
+            if (abs < bestMin) {
+                bestMin = abs;
+                best[0] = left;
+                best[1] = right;
             }
-            
-            if (sum < 0) {
-                left++;
-            } else if (sum > 0) {
-                right--;
-            } else {
+
+            if (abs == 0) {
                 break;
             }
+
+            if (sum < 0) {
+                left++;
+            } else {
+                right--;
+            }
         }
-        
-        if (recordL < recordR) {
-            System.out.println(recordL + " " + recordR);
-        } else {
-            System.out.println(recordR + " " + recordL);
+
+        return best;
+    }
+
+    private static void init() throws IOException {
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        n = Integer.parseInt(input.readLine());
+        num = new int[n];
+
+        StringTokenizer tokenizer = new StringTokenizer(input.readLine());
+        for (int i = 0; i < n; i++) {
+            num[i] = Integer.parseInt(tokenizer.nextToken());
         }
     }
 }
