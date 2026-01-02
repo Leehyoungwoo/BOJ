@@ -24,12 +24,12 @@ public class Main {
 
     private static void dfs(String current) {
         if (found) return;
-
-        if (current.length() < s.length()) return;
-
-        if (current.equals(s)) {
-            found = true;
-            return;
+        
+        if (current.length() == s.length()) {
+            if (current.equals(s)) {
+                found = true;
+                return;
+            }
         }
 
         if (current.endsWith("A")) {
@@ -38,9 +38,7 @@ public class Main {
 
         if (current.startsWith("B")) {
             String reversed = new StringBuilder(current).reverse().toString();
-            if (reversed.endsWith("B")) {
-                dfs(reversed.substring(0, reversed.length() - 1));
-            }
+            dfs(reversed.substring(0, reversed.length() - 1));
         }
     }
 }
