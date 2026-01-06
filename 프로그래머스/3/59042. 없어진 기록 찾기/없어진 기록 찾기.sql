@@ -1,11 +1,6 @@
-SELECT
-    o.ANIMAL_ID,
-    o.NAME
-FROM
-    ANIMAL_OUTS o
-LEFT JOIN
-    ANIMAL_INS i ON o.ANIMAL_ID = i.ANIMAL_ID
-WHERE
-    i.ANIMAL_ID IS NULL
-ORDER BY
-    o.ANIMAL_ID, o.name;
+select o.ANIMAL_ID, o.NAME
+from ANIMAL_OUTS o
+left join ANIMAL_INS i
+on i.ANIMAL_ID = o.ANIMAL_ID
+where i.DATETIME is null and o.DATETIME is not null
+order by o.ANIMAL_ID, o.name;
