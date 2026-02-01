@@ -12,16 +12,15 @@ int main() {
     sort(num.begin(), num.end());
     cin >> m;
     string result;
-    result.reserve(m * 2); 
     for (int i = 0; i < m; i++) {
         int target;
         cin >> target;
         
-        int count = upper_bound(num.begin(), num.end(), target) - lower_bound(num.begin(), num.end(), target);
-        if (count == 0) {
-            result+="0\n";
-        } else {
+        bool exists = binary_search(num.begin(), num.end(), target);
+        if (exists) {
             result+="1\n";
+        } else {
+            result+="0\n";
         }
     }
 
