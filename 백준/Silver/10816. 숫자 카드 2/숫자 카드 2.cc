@@ -1,28 +1,35 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int n, m;
-vector<int> card;
-vector<int> target;
 int main() {
     ios::sync_with_stdio(false);
-    cin.tie(NULL);
+    cin.tie(nullptr);
+
+    int n, m;
+    vector<int> card;
+
     cin >> n;
+    card.reserve(n);
     for (int i = 0; i < n; i++) {
         int x; cin >> x;
         card.push_back(x);
     }
 
+    sort(card.begin(), card.end());
+
     cin >> m;
+
+    string out;
+    out.reserve(m * 2);
+
     for (int i = 0; i < m; i++) {
         int x; cin >> x;
-        target.push_back(x);
-}
-
-    sort(card.begin(), card.end());
-    for (int i = 0; i < m; i++) {
-        cout << upper_bound(card.begin(), card.end(), target[i]) - lower_bound(card.begin(), card.end(), target[i]) << ' ';
+        int cnt = upper_bound(card.begin(), card.end(), x)
+                - lower_bound(card.begin(), card.end(), x);
+        out += to_string(cnt);
+        out += ' ';
     }
 
+    cout << out;
     return 0;
 }
