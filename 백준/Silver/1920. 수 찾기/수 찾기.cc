@@ -12,6 +12,7 @@ int main() {
     sort(num.begin(), num.end());
     cin >> m;
     string result;
+    result.reserve(m * 2); 
     for (int i = 0; i < m; i++) {
         int target;
         cin >> target;
