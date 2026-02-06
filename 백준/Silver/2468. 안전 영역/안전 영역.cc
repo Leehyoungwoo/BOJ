@@ -45,7 +45,7 @@ int main() {
     }
 
     // 비가 오는 양 => 최솟값부터 최댓값 -1 => 최댓값만큼 오면 모든게 잠기니까 의미가 없어서
-    for (int r = 0; r <= ma - 1; r++) {
+    for (int r = 0; r <= 99; r++) {
         int cnt = 0;
         memset(visited, 0, sizeof(visited));
 
