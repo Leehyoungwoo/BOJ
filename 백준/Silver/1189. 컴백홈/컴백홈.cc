@@ -1,43 +1,39 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
-int r, c, k;
-int cnt;
-char grid[101][101];
-bool visited[10][10];
-const int dir[4][4] = {{1, 0}, {0, 1}, {0, -1}, {-1, 0}};
-bool isInRange(int cr, int cc) {
-    return 0 <= cr && cr < r && 0 <= cc && cc < c;  
+int n, m, k;
+char mp[6][6];
+bool visited[6][6];
+const int dir[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+bool in(int r, int c) {
+    return 0<=r && r < n && 0 <= c && c < m;
 }
-void findWay(int curR, int curC, int endR, int endC, int dis) {
-    if (curR == endR && curC == endC) {
-        if (dis == k) {
-            cnt++;
-        }
-        return;
+int dfs(int cr, int cc, int dis) {
+    if (cr == 0 && cc == m - 1 && dis == k){
+        return 1;
     }
-    
-    for (int i = 0; i < 4; i++) {
-        int nr = curR + dir[i][0];
-        int nc = curC + dir[i][1];
-        if (isInRange(nr, nc) && grid[nr][nc] != 'T' && !visited[nr][nc]) {
+    int ret = 0;
+    for (auto d : dir) {
+        int nr = cr + d[0];
+        int nc = cc + d[1];
+        if (in(nr, nc) && !visited[nr][nc] && mp[nr][nc] != 'T') {
             visited[nr][nc] = true;
-            findWay(nr, nc, endR, endC, dis + 1);
+            ret+=dfs(nr, nc, dis + 1);
             visited[nr][nc] = false;
         }
     }
+
+    return ret;
 }
-int main(){
-    cin >> r >> c >> k;
-    for (int i = 0; i < r; i++) {
-        string input;
-        cin >> input;
-        for (int j = 0; j < c; j++) {
-            grid[i][j] = input[j];
+int main() {
+    cin >> n >> m >> k;
+    for (int i = 0; i < n; i++) {
+        string s;
+        cin >> s;
+        for (int j = 0; j < m; j++){
+            mp[i][j] = s[j];
         }
     }
-    visited[r -1][0] = true;
-    findWay(r - 1, 0, 0, c - 1, 1);
-
-    cout << cnt << "\n";
+    visited[n - 1][0] = true;
+    cout << dfs(n - 1, 0, 1) << "\n";
     return 0;
-}   
+}
