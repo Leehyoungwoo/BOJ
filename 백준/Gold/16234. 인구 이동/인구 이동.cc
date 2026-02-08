@@ -47,6 +47,7 @@ void find_union() {
             if (!visited[i][j]) {
                 vector<pair<int, int>> vec;
                 int area = bfs(i, j, vec);
+                // 한개는 연합이 아님
                 if ((int) vec.size() > 1) {
                     sz.push_back(area);
                     v.push_back(vec);
@@ -63,6 +64,9 @@ void split_people(vector<pair<int, int>> &v, int sum) {
 }
 int main() {
     cin >> n >> L >> R;
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
     for (int i = 0; i < n; i++){
         for (int j = 0; j < n; j++) {
             cin >> mp[i][j];
@@ -78,6 +82,7 @@ int main() {
         // 연합 찾기
         find_union();
         // 연합 사이즈가 0이면 (연합이 한개도 없으면 종료)
+        // sum계산도 미리 해놓자
         if (v.size() == 0) {
             break;
         }
