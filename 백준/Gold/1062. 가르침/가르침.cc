@@ -10,11 +10,9 @@ void comb(int start, int picked, int mask) {
         for (string s : v) {
             bool can = true;
             for (int j = 0; j < (int)s.size(); j++){
-                if (mask & (1 << (s[j] - 'a'))) {
-                    
-                } else {
-                    can = false;
-                }
+                if (mask & (1 << (s[j] - 'a'))) continue;
+                can = false;
+                
             }
             if (can) {
                 count++;
@@ -24,11 +22,9 @@ void comb(int start, int picked, int mask) {
         return;
     }
     for (int c = start + 1; c <= 26; c++) {
-        if (mask & (1 << c)) {
-            
-        } else {
-            comb(c, picked + 1, mask | (1<<c));
-        }
+        if (mask & (1 << c)) continue;
+
+        comb(c, picked + 1, mask | (1 << c));
     }
 
 }
@@ -44,7 +40,10 @@ int main(){
         cout << 0 << '\n';
         return 0;
     }
-
+    if (k == 26) {
+        cout << n << '\n';
+        return 0;
+    }
 
     int mask = 0;
     for (char c : need) {
