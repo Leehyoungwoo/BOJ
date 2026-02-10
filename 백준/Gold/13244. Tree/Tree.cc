@@ -28,7 +28,7 @@ int bfs(int node) {
 bool isTree(){
     memset(visited, false, sizeof(visited));
 
-    return n == bfs(1);
+    return n == bfs(n);
 }
 int main(){
     ios_base::sync_with_stdio(false);
