@@ -13,13 +13,17 @@ void print() {
     cout << '\n'; 
 }
 void setting(){
+    // n의 약수
     for (int i = 2; i * i <= n; i++) {
-        for (int j = 2; j <= n / i; j++) {
-            visited[i * j] = true;
+        // 약수의 배수를 n까지 체크
+        for (int j = i * i; j <= n; j+=i) {
+            visited[j] = true;
         }
     }
+    // 1은 소수가 아님
     visited[1] = true; 
     for (int i = 1; i <= n; i++) {
+        // 방문 안한 수는 소수
         if(!visited[i]) v.push_back(i); 
     }
 
