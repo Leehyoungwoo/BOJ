@@ -16,6 +16,7 @@ void setting(){
     // n의 약수
     for (int i = 2; i * i <= n; i++) {
         // 약수의 배수를 n까지 체크
+        if(visited[i]) continue;
         for (int j = i * i; j <= n; j+=i) {
             visited[j] = true;
         }
