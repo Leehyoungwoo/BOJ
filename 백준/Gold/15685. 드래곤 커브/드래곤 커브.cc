@@ -22,17 +22,11 @@ void draw(int x, int y, int d, int g) {
     // 방향을 담는다고 치자 -> 0세대 0, 1세대 1, 2세대는 2번 그려야하는데 2, 3이 아니라 2, 1임 -> 왜냐하면 커브에 대한 90도니까 끝점부터 
     // -> 끝점 90도 돌리고 시작점 돌리고
     // 그럼 위치가 있고 세대별로 이동하는 방향을 담는데 -> 전세대 역순으로 +1 %4
-    vector<int> total;
-    total.push_back(d);
+    vector<int> total = {d};
     for (int i = 0; i < g; i++) {
         int sz = (int) total.size();
-        vector<int> temp;
         for (int j = sz - 1; j >= 0; j--) {
-            int new_d = (total[j] + 1) % 4;
-            temp.push_back(new_d);
-        }
-        for (auto it : temp) {
-            total.push_back(it);
+            total.push_back((total[j] + 1) % 4);
         }
     }
     mp[y][x] = 1;
