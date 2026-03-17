@@ -1,28 +1,27 @@
 #include <bits/stdc++.h>
 using namespace std;
 int n;
-int l[21];
-int j[21];
-int dp[21][101];
-int hp = 100;
-int go(int idx, int hp) {
-    if (hp <= 0) return -1e9;
+int hp[101];
+int happy[101];
+int dp[101][20];
+int INF = 1e9;
+int go(int h, int idx) {
+    if (h <= 0) return -INF;
     if (idx == n) return 0;
-    
-    int &ret = dp[idx][hp];
+
+    int & ret = dp[h][idx];
     if (ret != -1) return ret;
-    ret = go(idx + 1, hp);
-    if (hp - l[idx] > 0) ret = max(ret , go(idx + 1, hp - l[idx]) + j[idx]);
+    ret = 0;
+    ret = max(go(h - hp[idx],idx + 1) + happy[idx], go(h, idx + 1));
 
     return ret;
 }
 int main(){
     cin >> n;
-    for(int i = 0; i < n; i++) cin >> l[i];
-
-    for (int i = 0; i < n; i++) cin >> j[i];
+    for (int i = 0; i < n; i++) cin >> hp[i];
+    for (int i = 0; i < n; i++) cin >> happy[i];
 
     memset(dp, -1, sizeof(dp));
-    cout << go(0, 100) << '\n';
+    cout << go(100, 0) << '\n';
     return 0;
 }
